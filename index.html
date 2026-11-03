@@ -11,7 +11,7 @@
     width: 100%; height: 100%;
     overflow: hidden;
     background: radial-gradient(circle at 50% 0%, #2a3f5f, #0f1722);
-    font-family: 'Segoe UI', Arial, sans-serif;
+    font-family: 'Segoe UI', Arial, 'Microsoft YaHei', 'PingFang SC', 'Noto Sans CJK SC', sans-serif;
     -webkit-user-select: none; user-select: none;
     touch-action: none;
     overscroll-behavior: none;
@@ -49,8 +49,11 @@
   #overlay p.score-line b { color: #ffe74c; font-size: 26px; }
   #overlay p.score-line b.total { color: #7dd3ff; }
   #overlay .seed { font-size: 16px; opacity: .6; margin: 20px 0 30px 0; font-family: monospace; }
+  #overlay .ov-buttons {
+    display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+  }
   #overlay button {
-    padding: 16px 52px; font-size: 22px; font-weight: 700;
+    padding: 16px 42px; font-size: 20px; font-weight: 700;
     color: #fff; border: none; border-radius: 50px; cursor: pointer;
     background: linear-gradient(135deg, #ff6b35, #f7931e);
     box-shadow: 0 10px 30px rgba(255,107,53,.5);
@@ -59,6 +62,15 @@
   }
   #overlay button:hover { transform: translateY(-2px) scale(1.04); }
   #overlay button:active { transform: translateY(0) scale(.98); }
+  #overlay button.btn-restart-ov {
+    background: rgba(255,255,255,.1);
+    border: 2px solid rgba(255,255,255,.25);
+    box-shadow: 0 6px 20px rgba(0,0,0,.3);
+  }
+  #overlay button.btn-restart-ov:hover {
+    background: rgba(255,255,255,.18);
+    border-color: rgba(255,255,255,.4);
+  }
 
   #seed-display {
     position: absolute; top: 12px; right: 16px;
@@ -138,7 +150,7 @@
     display: flex; flex-direction: column; gap: 14px;
     margin-bottom: 32px; align-items: center;
   }
-  .btn-primary, .btn-secondary, .btn-help {
+  .btn-primary, .btn-secondary, .btn-help, .btn-restart {
     width: 280px; max-width: 90vw;
     padding: 18px 32px; font-size: 20px; font-weight: 700;
     letter-spacing: 3px; border: none; border-radius: 50px;
@@ -176,6 +188,22 @@
     box-shadow: 0 10px 30px rgba(255,210,63,.25);
   }
   .btn-help:active { transform: translateY(0) scale(.98); }
+  /* ★ 新增：重新開始按鈕（開始頁） */
+  .btn-restart {
+    color: #ff8b8b;
+    background: rgba(255,107,107,.08);
+    border: 2px solid rgba(255,107,107,.25);
+    box-shadow: 0 6px 20px rgba(0,0,0,.3);
+    display: none;   /* 只有當有舊紀錄時才顯示 */
+  }
+  .btn-restart.visible { display: flex; }
+  .btn-restart:hover {
+    transform: translateY(-2px);
+    background: rgba(255,107,107,.16);
+    border-color: rgba(255,107,107,.5);
+    box-shadow: 0 10px 30px rgba(255,107,107,.25);
+  }
+  .btn-restart:active { transform: translateY(0) scale(.98); }
 
   #seed-panel {
     margin-top: 16px; padding: 22px 28px;
@@ -243,6 +271,79 @@
   }
 
   #start-footer { margin-top: 40px; font-size: 12px; letter-spacing: 2px; opacity: .4; }
+
+  /* 語言切換器 */
+  #lang-switcher {
+    position: absolute; top: 16px; right: 16px;
+    z-index: 10;
+    display: flex; gap: 4px;
+    padding: 4px;
+    background: rgba(0,0,0,.5);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
+  }
+  .lang-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,.55);
+    background: transparent;
+    border: none;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .lang-btn:hover { color: rgba(255,255,255,.85); background: rgba(255,255,255,.06); }
+  .lang-btn.active {
+    color: #0f1722;
+    background: linear-gradient(135deg, #ffd23f, #ff6b35);
+    box-shadow: 0 2px 8px rgba(255,210,63,.4);
+  }
+  #lang-switcher.in-game {
+    top: 8px; right: 100px;
+    background: rgba(0,0,0,.4);
+    padding: 3px;
+  }
+  #lang-switcher.in-game .lang-btn {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  /* ★ 新增：遊戲內「重新開始」按鈕 */
+  #restart-btn {
+    position: absolute;
+    top: 8px; right: 100px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,.85);
+    background: rgba(255,107,107,.15);
+    border: 1px solid rgba(255,107,107,.35);
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    z-index: 3;
+    display: none;
+    transition: all .15s;
+    backdrop-filter: blur(10px);
+  }
+  #restart-btn.visible { display: flex; align-items: center; gap: 4px; }
+  #restart-btn:hover {
+    background: rgba(255,107,107,.3);
+    border-color: rgba(255,107,107,.6);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  #restart-btn:active { transform: translateY(0) scale(.97); }
+
+  /* 因為有 restart 按鈕，語言切換器在遊戲內往左移 */
+  #lang-switcher.in-game {
+    right: 200px;
+  }
 
   #help-screen {
     position: absolute; inset: 0;
@@ -594,10 +695,72 @@
   #toast.error { border-color: rgba(255, 107, 107, .6); color: #ff8b8b; }
   #toast.success { border-color: rgba(74, 222, 128, .6); color: #7de89a; }
 
+  /* ★ 確認對話框 */
+  #confirm-dialog {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(4px);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 12;
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s;
+  }
+  #confirm-dialog.visible { opacity: 1; pointer-events: auto; }
+  #confirm-box {
+    background: linear-gradient(180deg, #1e2a42, #0f1722);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 20px;
+    padding: 32px 40px;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,.7);
+    transform: scale(.9);
+    transition: transform .25s;
+  }
+  #confirm-dialog.visible #confirm-box { transform: scale(1); }
+  #confirm-title {
+    font-size: 22px; font-weight: 800;
+    color: #fff;
+    margin-bottom: 12px;
+    letter-spacing: 2px;
+  }
+  #confirm-message {
+    font-size: 15px;
+    color: rgba(255,255,255,.75);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  #confirm-message b { color: #ffe74c; }
+  #confirm-buttons {
+    display: flex; gap: 12px; justify-content: center;
+  }
+  .confirm-btn {
+    padding: 12px 32px;
+    font-size: 16px; font-weight: 700;
+    border: none; border-radius: 30px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: transform .15s;
+  }
+  .confirm-btn:hover { transform: translateY(-1px); }
+  .confirm-btn:active { transform: translateY(0) scale(.97); }
+  #confirm-cancel {
+    color: #fff;
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.2);
+  }
+  #confirm-cancel:hover { background: rgba(255,255,255,.18); }
+  #confirm-ok {
+    color: #fff;
+    background: linear-gradient(135deg, #ff4757, #c0143c);
+    box-shadow: 0 6px 20px rgba(255,71,87,.4);
+  }
+  #confirm-ok:hover { box-shadow: 0 10px 30px rgba(255,71,87,.6); }
+
   @media (max-width: 480px) {
     #game-title { letter-spacing: 3px; }
     #game-subtitle { letter-spacing: 4px; margin-bottom: 24px; }
-    .btn-primary, .btn-secondary, .btn-help { padding: 14px 24px; font-size: 17px; }
+    .btn-primary, .btn-secondary, .btn-help, .btn-restart { padding: 14px 24px; font-size: 17px; }
     #start-content { padding: 24px 16px; }
     #seed-panel { padding: 16px 18px; }
     #help-header { padding: 14px 16px; }
@@ -609,12 +772,28 @@
     .guide-section h3 { font-size: 15px; }
     .bird-card { padding: 14px; }
     .bird-avatar { width: 48px; height: 48px; font-size: 26px; }
+    #lang-switcher { top: 8px; right: 8px; }
+    #lang-switcher.in-game { top: 4px; right: 172px; }
+    .lang-btn { padding: 4px 10px; font-size: 11px; }
+    #restart-btn { top: 4px; right: 72px; padding: 4px 10px; font-size: 11px; }
+    #confirm-box { padding: 24px 20px; margin: 0 16px; }
   }
 </style>
 </head>
 <body>
 <div id="game-container">
   <canvas id="game"></canvas>
+
+  <div id="lang-switcher">
+    <button class="lang-btn" data-lang="zh-TW">繁</button>
+    <button class="lang-btn" data-lang="zh-CN">简</button>
+    <button class="lang-btn" data-lang="en">EN</button>
+  </div>
+
+  <!-- ★ 遊戲內「重新開始」按鈕 -->
+  <button id="restart-btn" title="Restart">
+    <span>🔄</span><span data-i18n="restartBtn">重新开始</span>
+  </button>
 
   <div id="start-screen">
     <div class="float-shape" style="width:180px;height:180px;background:#ff6b35;top:12%;left:8%;animation-delay:0s;"></div>
@@ -628,161 +807,91 @@
 
       <div id="start-buttons">
         <button class="btn-primary" id="btn-start">
-          <span>🎮</span><span>开始游戏</span>
+          <span>🎮</span><span data-i18n="btnStart">开始游戏</span>
         </button>
         <button class="btn-help" id="btn-help">
-          <span>📖</span><span>游戏玩法</span>
+          <span>📖</span><span data-i18n="btnHelp">游戏玩法</span>
         </button>
         <button class="btn-secondary" id="btn-seed">
-          <span>🌱</span><span>输入种子</span>
+          <span>🌱</span><span data-i18n="btnSeed">输入种子</span>
+        </button>
+        <!-- ★ 新增：開始頁「重新開始」按鈕（有舊紀錄時才顯示） -->
+        <button class="btn-restart" id="btn-restart">
+          <span>🔄</span><span data-i18n="restartBtn">重新开始</span>
         </button>
       </div>
 
       <div id="seed-panel" class="collapsed">
-        <label>关 卡 种 子（5 位 Base36）</label>
+        <label data-i18n="seedLabel">关 卡 种 子（5 位 Base36）</label>
         <div class="seed-input-row">
           <input id="seed-input" type="text" maxlength="5"
                  placeholder="ABC12" autocomplete="off" spellcheck="false">
-          <button id="seed-go">开始</button>
+          <button id="seed-go" data-i18n="seedGo">开始</button>
         </div>
         <div id="seed-error"></div>
-        <div id="seed-hint">输入相同种子可复现同一关卡</div>
+        <div id="seed-hint" data-i18n="seedHint">输入相同种子可复现同一关卡</div>
         <div id="seed-history"></div>
       </div>
 
-      <div id="start-footer">拖动小鸟发射 · 飞行中点击触发特殊能力</div>
+      <div id="start-footer" data-i18n="startFooter">拖动小鸟发射 · 飞行中点击触发特殊能力</div>
     </div>
   </div>
 
   <div id="help-screen">
     <div id="help-header">
-      <div id="help-title">📖 游 戏 说 明</div>
+      <div id="help-title" data-i18n="helpTitle">📖 游 戏 说 明</div>
       <button id="help-close" title="关闭 (Esc)">✕</button>
     </div>
 
     <div id="help-tabs">
       <button class="help-tab active" data-tab="guide">
-        <span>🎯</span><span>玩法教程</span>
+        <span>🎯</span><span data-i18n="tabGuide">玩法教程</span>
       </button>
       <button class="help-tab" data-tab="birds">
-        <span>🐦</span><span>小鸟图鉴</span>
+        <span>🐦</span><span data-i18n="tabBirds">小鸟图鉴</span>
       </button>
     </div>
 
     <div id="help-body">
-      <div class="help-page active" data-page="guide">
-        <div class="guide-section">
-          <h3><span class="icon">🎮</span>游戏目标</h3>
-          <div class="guide-steps">
-            <div class="guide-step">
-              <div class="step-num">1</div>
-              <div class="step-text">用弹弓发射小鸟，<strong>击倒所有绿色小猪</strong>即可通关。</div>
-            </div>
-            <div class="guide-step">
-              <div class="step-num">2</div>
-              <div class="step-text">每关有<strong>限定数量的小鸟</strong>，必须在用尽前清除全部小猪。</div>
-            </div>
-            <div class="guide-step">
-              <div class="step-num">3</div>
-              <div class="step-text">小猪被撞飞、压扁或滚落出场地都会被消灭，但<strong>飞出场地不算击杀</strong>（没分数）。</div>
-            </div>
-            <div class="guide-step">
-              <div class="step-num">4</div>
-              <div class="step-text">除黄鸟外，小鸟静止 <strong>0.5 秒</strong>会自动结束回合。<strong>黑鸟和紫鸟</strong>在本回合结束后会<strong>额外存活 2 秒</strong>，可继续飞行与使用技能。</div>
-            </div>
-            <div class="guide-step">
-              <div class="step-num" style="background:linear-gradient(135deg,#7dd3ff,#3a86ff);">📊</div>
-              <div class="step-text">左上角 UI 会同时显示<strong>本关分数</strong>与<strong>总分</strong>（从游戏开始累积，刷新页面才会清零）。</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="guide-section">
-          <h3><span class="icon">🎯</span>操作说明</h3>
-          <div class="guide-grid">
-            <div class="guide-card">
-              <div class="kbd">拖拽</div>
-              <div class="desc">按住弹弓上的小鸟向后拉，调整角度与力度</div>
-            </div>
-            <div class="guide-card">
-              <div class="kbd">松手</div>
-              <div class="desc">发射！力度条越长，小鸟飞得越快</div>
-            </div>
-            <div class="guide-card">
-              <div class="kbd">点击</div>
-              <div class="desc">飞行中点击屏幕任意位置，发动小鸟特殊能力</div>
-            </div>
-            <div class="guide-card">
-              <div class="kbd">空格</div>
-              <div class="desc">有技能时发动技能；否则跳过当前回合</div>
-            </div>
-            <div class="guide-card">
-              <div class="kbd">R</div>
-              <div class="desc">重玩本关（种子相同，布局一致）</div>
-            </div>
-            <div class="guide-card">
-              <div class="kbd">N</div>
-              <div class="desc">生成全新随机关卡</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="guide-section">
-          <h3><span class="icon">🏆</span>计分规则</h3>
-          <div class="guide-steps">
-            <div class="guide-step">
-              <div class="step-num" style="background:linear-gradient(135deg,#5cb85c,#2d6a2d);">🐷</div>
-              <div class="step-text">每只小猪被击杀：<strong>+1000 分</strong></div>
-            </div>
-            <div class="guide-step">
-              <div class="step-num" style="background:linear-gradient(135deg,#c8843c,#7a4a1e);">🧱</div>
-              <div class="step-text">每块建筑被破坏：<strong>+50 分</strong></div>
-            </div>
-            <div class="guide-step">
-              <div class="step-num" style="background:linear-gradient(135deg,#ffd23f,#d4a017);">🐦</div>
-              <div class="step-text">通关时剩余每只小鸟：<strong>+500 分</strong></div>
-            </div>
-            <div class="guide-step">
-              <div class="step-num" style="background:linear-gradient(135deg,#7dd3ff,#3a86ff);">📊</div>
-              <div class="step-text">所有得分<strong>实时累加到总分</strong>，跨关卡保留</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="guide-section">
-          <h3><span class="icon">🧱</span>建筑材质</h3>
-          <div class="material-row">
-            <div class="material-swatch" style="background:#c8843c;"></div>
-            <div class="material-info"><strong>木头</strong>：中等硬度，适合普通小鸟</div>
-          </div>
-          <div class="material-row">
-            <div class="material-swatch" style="background:#a8e6ff;"></div>
-            <div class="material-info"><strong>冰块</strong>：很脆但轻，一撞就碎</div>
-          </div>
-          <div class="material-row">
-            <div class="material-swatch" style="background:#8b8d99;"></div>
-            <div class="material-info"><strong>石头</strong>：最坚硬，需要重击或爆炸</div>
-          </div>
-        </div>
-      </div>
-
+      <div class="help-page active" data-page="guide" id="guide-content"></div>
       <div class="help-page" data-page="birds">
         <div class="bird-grid" id="bird-grid"></div>
       </div>
     </div>
 
-    <div id="help-hint">按 Esc 关闭 · 上下滚动查看更多</div>
+    <div id="help-hint" data-i18n="helpHint">按 Esc 关闭 · 上下滚动查看更多</div>
   </div>
 
   <div id="seed-display"></div>
-  <button id="copy-seed-btn" title="复制当前种子">📋 复制</button>
-  <div id="loading" class="hidden">生成关卡中…</div>
+  <button id="copy-seed-btn" title="Copy seed">📋 <span data-i18n="copyBtn">复制</span></button>
+  <div id="loading" class="hidden" data-i18n="loading">生成关卡中…</div>
 
   <div id="overlay" class="hidden">
     <h1 id="ov-title">YOU WIN!</h1>
     <p class="score-line" id="ov-text">Score: 0</p>
     <p class="seed" id="ov-seed"></p>
-    <button id="ov-btn">下一关</button>
+    <div class="ov-buttons">
+      <!-- ★ 主按鈕 -->
+      <button id="ov-btn">下一关</button>
+      <!-- ★ 新增：結算頁「重新開始」按鈕 -->
+      <button class="btn-restart-ov" id="ov-restart-btn" data-i18n="restartBtn">重新开始</button>
+    </div>
+  </div>
+
+  <!-- ★ 確認對話框 -->
+  <div id="confirm-dialog">
+    <div id="confirm-box">
+      <div id="confirm-title" data-i18n="confirmTitle">确定要重新开始？</div>
+      <div id="confirm-message">
+        <span data-i18n="confirmMessage">当前总分</span>
+        <b id="confirm-score">0</b>
+        <span data-i18n="confirmMessage2">将会清零，进度不可恢复。</span>
+      </div>
+      <div id="confirm-buttons">
+        <button class="confirm-btn" id="confirm-cancel" data-i18n="confirmCancel">取消</button>
+        <button class="confirm-btn" id="confirm-ok" data-i18n="confirmOk">确定重新开始</button>
+      </div>
+    </div>
   </div>
 
   <div id="toast"></div>
@@ -790,6 +899,365 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 <script>
+// ============================================================
+//  i18n 系統
+// ============================================================
+const TRANSLATIONS = {
+  'zh-TW': {
+    btnStart: '開始遊戲',
+    btnHelp: '遊戲玩法',
+    btnSeed: '輸入種子',
+    restartBtn: '重新開始',
+    seedLabel: '關 卡 種 子（5 位 Base36）',
+    seedGo: '開始',
+    seedHint: '輸入相同種子可復現同一關卡',
+    seedErrorEmpty: '請輸入種子',
+    seedErrorChars: '只能包含 0-9 和 A-Z',
+    seedErrorLong: '最多 5 個字元',
+    seedErrorInvalid: '無效種子，請重試',
+    startFooter: '拖動小鳥發射 · 飛行中點擊觸發特殊能力',
+    helpTitle: '📖 遊 戲 說 明',
+    tabGuide: '玩法教程',
+    tabBirds: '小鳥圖鑑',
+    helpHint: '按 Esc 關閉 · 上下滾動查看更多',
+    copyBtn: '複製',
+    copied: '已複製種子',
+    copyFail: '複製失敗，請手動記下',
+    loading: '生成關卡中…',
+    youWin: 'YOU WIN!',
+    gameOver: 'GAME OVER',
+    levelScore: '本關分數',
+    totalScore: '總分',
+    nextLevel: '下一關',
+    retryLevel: '重試本關',
+    restartBtnConfirm: '重新開始',
+    confirmTitle: '確定要重新開始？',
+    confirmMessage: '目前總分',
+    confirmMessage2: '將會清零，進度不可恢復。',
+    confirmCancel: '取消',
+    confirmOk: '確定重新開始',
+    confirmStartTitle: '確定要開始新遊戲？',
+    confirmStartMessage: '目前進度（總分',
+    confirmStartMessage2: '）將被清除。',
+    hudScore: '本關分數',
+    hudTotal: '總分',
+    hudBirds: 'BIRDS',
+    hudPigs: 'PIGS',
+    hudLevel: '關卡',
+    hudHint1: '拖動小鳥發射 · 飛行中點擊/空格 = 特殊能力',
+    hudHint2: 'R = 重玩本關 · N = 生成新關卡',
+    hudSkip: '跳過本回合',
+    hudCooldown: '技能冷卻中...',
+    hudContinuous: '連點：持續發動',
+    hudUsed: '技能已用',
+    hudEggs: '投蛋',
+    hudEggsExhausted: '已用盡',
+    hudExtraLife: '延壽',
+    guide: {
+      goalTitle: '🎮 遊戲目標',
+      goal1: '用彈弓發射小鳥，<strong>擊倒所有綠色小豬</strong>即可通關。',
+      goal2: '每關有<strong>限定數量的小鳥</strong>，必須在用盡前清除全部小豬。',
+      goal3: '小豬被撞飛、壓扁或滾落出場地都會被消滅，但<strong>飛出場地不算擊殺</strong>（沒分數）。',
+      goal4: '除黃鳥外，小鳥靜止 <strong>0.5 秒</strong>會自動結束回合。<strong>黑鳥和紫鳥</strong>在本回合結束後會<strong>額外存活 2 秒</strong>，可繼續飛行與使用技能。',
+      goal5: '左上角 UI 會同時顯示<strong>本關分數</strong>與<strong>總分</strong>（從遊戲開始累積，刷新頁面才會清零）。',
+      goal6: '右上角<strong>🔄 重新開始</strong>按鈕可立即重置所有進度，總分清零、回到第 1 關。',
+      opsTitle: '🎯 操作說明',
+      opDrag: '按住彈弓上的小鳥向後拉，調整角度與力度',
+      opRelease: '發射！力度條越長，小鳥飛得越快',
+      opClick: '飛行中點擊螢幕任意位置，發動小鳥特殊能力',
+      opSpace: '有技能時發動技能；否則跳過當前回合',
+      opR: '重玩本關（種子相同，佈局一致）',
+      opN: '生成全新隨機關卡',
+      opRestart: '重新開始（總分清零，回到第 1 關）',
+      scoreTitle: '🏆 計分規則',
+      score1: '每隻小豬被擊殺：<strong>+1000 分</strong>',
+      score2: '每塊建築被破壞：<strong>+50 分</strong>',
+      score3: '通關時剩餘每隻小鳥：<strong>+500 分</strong>',
+      score4: '所有得分<strong>即時累加到總分</strong>，跨關卡保留',
+      matTitle: '🧱 建築材質',
+      matWood: '<strong>木頭</strong>：中等硬度，適合普通小鳥',
+      matIce: '<strong>冰塊</strong>：很脆但輕，一撞就碎',
+      matStone: '<strong>石頭</strong>：最堅硬，需要重擊或爆炸',
+    },
+    birds: {
+      red: { name: '紅鳥', desc: '最標準的小鳥', tag: '基礎', abilityTitle: '無特殊能力', abilityDesc: '穩定的物理屬性，血量中等，適合精準射擊', usage: '' },
+      yellow: { name: '黃鳥', desc: '三角衝刺專家', tag: '無限', abilityTitle: '衝刺加速（可無限使用，自動結算豁免）', abilityDesc: '每次點擊都在當前方向疊加 12px/step 的速度（上限 40），可連續點擊穿透多堵牆', usage: '黃鳥是唯一不受 0.5 秒自動結算限制的鳥' },
+      black: { name: '黑鳥', desc: '定時炸彈 + 延壽', tag: '延壽', abilityTitle: '爆炸（大範圍）+ 額外存活 2 秒', abilityDesc: '半徑 180px 的衝擊波，對範圍內所有物體造成 500 傷害', usage: '★ 本回合額外存活 2 秒，2 秒內可繼續飛行' },
+      blue: { name: '藍鳥', desc: '三向分裂', tag: '主動', abilityTitle: '分裂', abilityDesc: '分裂成 3 隻小藍鳥，扇面覆蓋，每隻繼承 1.15x 速度', usage: '打散小豬群或同時擊中多目標' },
+      white: { name: '白鳥', desc: '小範圍精準空投', tag: '無限', abilityTitle: '投蛋（每隻鳥最多 5 次，小範圍爆炸）', abilityDesc: '每次點擊投下重蛋（0.5 秒爆炸，半徑 90px，約為黑鳥的一半）', usage: '適合精準打擊單個目標' },
+      green: { name: '綠鳥', desc: '迴旋鏢', tag: '特殊', abilityTitle: '迴旋', abilityDesc: '瞬間反向飛行，水平速度變為 -1.4 倍', usage: '打擊背後或內部的小豬' },
+      orange: { name: '橙鳥', desc: '膨脹衝擊', tag: '特殊', abilityTitle: '膨脹', abilityDesc: '質量變為 2.8 倍持續 1 秒，衝擊力極大', usage: '重擊石頭牆或撞倒整座塔' },
+      purple: { name: '紫鳥', desc: '持續電磁場 + 延壽', tag: '延壽', abilityTitle: '電磁脈衝（持續 1.5 秒）+ 額外存活 2 秒', abilityDesc: '半徑 260px 內持續吸引物體，每次脈衝造成 150 傷害', usage: '★ 本回合額外存活 2 秒，可再次觸發 EMP' },
+    },
+    abilityHints: {
+      dash: '點擊：衝刺 (可連點)',
+      bomb: '點擊：爆炸',
+      split: '點擊：分裂',
+      egg: '點擊：投蛋',
+      boomerang: '點擊：迴旋',
+      inflate: '點擊：膨脹',
+      emp: '點擊：電磁',
+    },
+  },
+
+  'zh-CN': {
+    btnStart: '开始游戏',
+    btnHelp: '游戏玩法',
+    btnSeed: '输入种子',
+    restartBtn: '重新开始',
+    seedLabel: '关 卡 种 子（5 位 Base36）',
+    seedGo: '开始',
+    seedHint: '输入相同种子可复现同一关卡',
+    seedErrorEmpty: '请输入种子',
+    seedErrorChars: '只能包含 0-9 和 A-Z',
+    seedErrorLong: '最多 5 个字符',
+    seedErrorInvalid: '无效种子，请重试',
+    startFooter: '拖动小鸟发射 · 飞行中点击触发特殊能力',
+    helpTitle: '📖 游 戏 说 明',
+    tabGuide: '玩法教程',
+    tabBirds: '小鸟图鉴',
+    helpHint: '按 Esc 关闭 · 上下滚动查看更多',
+    copyBtn: '复制',
+    copied: '已复制种子',
+    copyFail: '复制失败，请手动记下',
+    loading: '生成关卡中…',
+    youWin: 'YOU WIN!',
+    gameOver: 'GAME OVER',
+    levelScore: '本关分数',
+    totalScore: '总分',
+    nextLevel: '下一关',
+    retryLevel: '重试本关',
+    restartBtnConfirm: '重新开始',
+    confirmTitle: '确定要重新开始？',
+    confirmMessage: '当前总分',
+    confirmMessage2: '将会清零，进度不可恢复。',
+    confirmCancel: '取消',
+    confirmOk: '确定重新开始',
+    confirmStartTitle: '确定要开始新游戏？',
+    confirmStartMessage: '当前进度（总分',
+    confirmStartMessage2: '）将被清除。',
+    hudScore: '本关分数',
+    hudTotal: '总分',
+    hudBirds: 'BIRDS',
+    hudPigs: 'PIGS',
+    hudLevel: '关卡',
+    hudHint1: '拖动小鸟发射 · 飞行中点击/空格 = 特殊能力',
+    hudHint2: 'R = 重玩本关 · N = 生成新关卡',
+    hudSkip: '跳过本回合',
+    hudCooldown: '技能冷却中...',
+    hudContinuous: '连点：持续发动',
+    hudUsed: '技能已用',
+    hudEggs: '投蛋',
+    hudEggsExhausted: '已用尽',
+    hudExtraLife: '延寿',
+    guide: {
+      goalTitle: '🎮 游戏目标',
+      goal1: '用弹弓发射小鸟，<strong>击倒所有绿色小猪</strong>即可通关。',
+      goal2: '每关有<strong>限定数量的小鸟</strong>，必须在用尽前清除全部小猪。',
+      goal3: '小猪被撞飞、压扁或滚落出场地都会被消灭，但<strong>飞出场地不算击杀</strong>（没分数）。',
+      goal4: '除黄鸟外，小鸟静止 <strong>0.5 秒</strong>会自动结束回合。<strong>黑鸟和紫鸟</strong>在本回合结束后会<strong>额外存活 2 秒</strong>，可继续飞行与使用技能。',
+      goal5: '左上角 UI 会同时显示<strong>本关分数</strong>与<strong>总分</strong>（从游戏开始累积，刷新页面才会清零）。',
+      goal6: '右上角<strong>🔄 重新开始</strong>按钮可立即重置所有进度，总分清零、回到第 1 关。',
+      opsTitle: '🎯 操作说明',
+      opDrag: '按住弹弓上的小鸟向后拉，调整角度与力度',
+      opRelease: '发射！力度条越长，小鸟飞得越快',
+      opClick: '飞行中点击屏幕任意位置，发动小鸟特殊能力',
+      opSpace: '有技能时发动技能；否则跳过当前回合',
+      opR: '重玩本关（种子相同，布局一致）',
+      opN: '生成全新随机关卡',
+      opRestart: '重新开始（总分清零，回到第 1 关）',
+      scoreTitle: '🏆 计分规则',
+      score1: '每只小猪被击杀：<strong>+1000 分</strong>',
+      score2: '每块建筑被破坏：<strong>+50 分</strong>',
+      score3: '通关时剩余每只小鸟：<strong>+500 分</strong>',
+      score4: '所有得分<strong>实时累加到总分</strong>，跨关卡保留',
+      matTitle: '🧱 建筑材质',
+      matWood: '<strong>木头</strong>：中等硬度，适合普通小鸟',
+      matIce: '<strong>冰块</strong>：很脆但轻，一撞就碎',
+      matStone: '<strong>石头</strong>：最坚硬，需要重击或爆炸',
+    },
+    birds: {
+      red: { name: '红鸟', desc: '最标准的小鸟', tag: '基础', abilityTitle: '无特殊能力', abilityDesc: '稳定的物理属性，血量中等，适合精准射击', usage: '' },
+      yellow: { name: '黄鸟', desc: '三角冲刺专家', tag: '无限', abilityTitle: '冲刺加速（可无限使用，自动结算豁免）', abilityDesc: '每次点击都在当前方向叠加 12px/step 的速度（上限 40），可连续点击穿透多堵墙', usage: '黄鸟是唯一不受 0.5 秒自动结算限制的鸟' },
+      black: { name: '黑鸟', desc: '定时炸弹 + 延寿', tag: '延寿', abilityTitle: '爆炸（大范围）+ 额外存活 2 秒', abilityDesc: '半径 180px 的冲击波，对范围内所有物体造成 500 伤害', usage: '★ 本回合额外存活 2 秒，2 秒内可继续飞行' },
+      blue: { name: '蓝鸟', desc: '三向分裂', tag: '主动', abilityTitle: '分裂', abilityDesc: '分裂成 3 只小蓝鸟，扇面覆盖，每只继承 1.15x 速度', usage: '打散小猪群或同时击中多目标' },
+      white: { name: '白鸟', desc: '小范围精准空投', tag: '无限', abilityTitle: '投蛋（每只鸟最多 5 次，小范围爆炸）', abilityDesc: '每次点击投下重蛋（0.5 秒爆炸，半径 90px，约为黑鸟的一半）', usage: '适合精准打击单个目标' },
+      green: { name: '绿鸟', desc: '回旋镖', tag: '特殊', abilityTitle: '回旋', abilityDesc: '瞬间反向飞行，水平速度变为 -1.4 倍', usage: '打击背后或内部的小猪' },
+      orange: { name: '橙鸟', desc: '膨胀冲击', tag: '特殊', abilityTitle: '膨胀', abilityDesc: '质量变为 2.8 倍持续 1 秒，冲击力极大', usage: '重击石头墙或撞倒整座塔' },
+      purple: { name: '紫鸟', desc: '持续电磁场 + 延寿', tag: '延寿', abilityTitle: '电磁脉冲（持续 1.5 秒）+ 额外存活 2 秒', abilityDesc: '半径 260px 内持续吸引物体，每次脉冲造成 150 伤害', usage: '★ 本回合额外存活 2 秒，可再次触发 EMP' },
+    },
+    abilityHints: {
+      dash: '点击：冲刺 (可连点)',
+      bomb: '点击：爆炸',
+      split: '点击：分裂',
+      egg: '点击：投蛋',
+      boomerang: '点击：回旋',
+      inflate: '点击：膨胀',
+      emp: '点击：电磁',
+    },
+  },
+
+  'en': {
+    btnStart: 'Start Game',
+    btnHelp: 'How to Play',
+    btnSeed: 'Enter Seed',
+    restartBtn: 'Restart',
+    seedLabel: 'LEVEL SEED (5-char Base36)',
+    seedGo: 'Start',
+    seedHint: 'Same seed reproduces the same level',
+    seedErrorEmpty: 'Please enter a seed',
+    seedErrorChars: 'Only 0-9 and A-Z allowed',
+    seedErrorLong: 'Max 5 characters',
+    seedErrorInvalid: 'Invalid seed, please try again',
+    startFooter: 'Drag bird to launch · Tap in flight to use ability',
+    helpTitle: '📖 HOW TO PLAY',
+    tabGuide: 'Guide',
+    tabBirds: 'Birds',
+    helpHint: 'Press Esc to close · Scroll for more',
+    copyBtn: 'Copy',
+    copied: 'Seed copied',
+    copyFail: 'Copy failed, please note manually: ',
+    loading: 'Generating level…',
+    youWin: 'YOU WIN!',
+    gameOver: 'GAME OVER',
+    levelScore: 'Level Score',
+    totalScore: 'Total',
+    nextLevel: 'Next Level',
+    retryLevel: 'Retry',
+    restartBtnConfirm: 'Restart',
+    confirmTitle: 'Restart the game?',
+    confirmMessage: 'Current total score',
+    confirmMessage2: 'will be reset. Progress cannot be recovered.',
+    confirmCancel: 'Cancel',
+    confirmOk: 'Yes, restart',
+    confirmStartTitle: 'Start a new game?',
+    confirmStartMessage: 'Current progress (total score',
+    confirmStartMessage2: ') will be cleared.',
+    hudScore: 'LEVEL',
+    hudTotal: 'TOTAL',
+    hudBirds: 'BIRDS',
+    hudPigs: 'PIGS',
+    hudLevel: 'Level',
+    hudHint1: 'Drag to launch · Tap/Space in flight = ability',
+    hudHint2: 'R = Retry · N = New level',
+    hudSkip: 'Skip Turn',
+    hudCooldown: 'Cooling down…',
+    hudContinuous: 'Tap: continuous',
+    hudUsed: 'Ability used',
+    hudEggs: 'Eggs',
+    hudEggsExhausted: 'exhausted',
+    hudExtraLife: 'Linger',
+    guide: {
+      goalTitle: '🎮 Goal',
+      goal1: 'Launch birds with the slingshot to <strong>knock down all green pigs</strong>.',
+      goal2: 'Each level has a <strong>limited number of birds</strong>. Clear all pigs before you run out.',
+      goal3: 'Pigs die when knocked off, squashed, or rolled off the field. But <strong>flying off the field doesn\'t count as a kill</strong> (no points).',
+      goal4: 'Except the Yellow Bird, a bird that stays still for <strong>0.5s</strong> auto-ends the turn. <strong>Black and Purple Birds</strong> get an <strong>extra 2 seconds</strong> of life after the turn would end — they can keep flying and use abilities.',
+      goal5: 'The top-left HUD shows both <strong>level score</strong> and <strong>total score</strong> (cumulative, only reset on page refresh).',
+      goal6: 'The <strong>🔄 Restart</strong> button in the top-right resets everything: total score to zero, back to level 1.',
+      opsTitle: '🎯 Controls',
+      opDrag: 'Drag the bird on the slingshot backward to aim',
+      opRelease: 'Release to launch! Longer pull = faster flight',
+      opClick: 'Tap anywhere during flight to trigger the bird\'s ability',
+      opSpace: 'Use ability if available; otherwise skip turn',
+      opR: 'Retry this level (same seed, same layout)',
+      opN: 'Generate a brand-new random level',
+      opRestart: 'Restart (reset total score, back to level 1)',
+      scoreTitle: '🏆 Scoring',
+      score1: 'Each pig defeated: <strong>+1000 points</strong>',
+      score2: 'Each block destroyed: <strong>+50 points</strong>',
+      score3: 'Each unused bird on win: <strong>+500 points</strong>',
+      score4: 'All points <strong>instantly add to total score</strong> across levels',
+      matTitle: '🧱 Materials',
+      matWood: '<strong>Wood</strong>: medium hardness, good for normal birds',
+      matIce: '<strong>Ice</strong>: fragile and light, shatters easily',
+      matStone: '<strong>Stone</strong>: hardest, needs heavy hits or explosions',
+    },
+    birds: {
+      red: { name: 'Red', desc: 'The classic bird', tag: 'Basic', abilityTitle: 'No ability', abilityDesc: 'Balanced stats, good for precise shots', usage: '' },
+      yellow: { name: 'Yellow', desc: 'Triangle dash expert', tag: 'Unlimited', abilityTitle: 'Dash Boost (unlimited, auto-settle exempt)', abilityDesc: 'Each tap adds 12px/step velocity (cap 40) along current direction — chain taps to pierce many walls', usage: 'The only bird exempt from the 0.5s auto-settle' },
+      black: { name: 'Black', desc: 'Timed bomb + Linger', tag: 'Linger', abilityTitle: 'Explosion (large) + 2s extra life', abilityDesc: 'Shockwave radius 180px, 500 damage to everything in range', usage: '★ Lives 2 extra seconds after turn; keep flying' },
+      blue: { name: 'Blue', desc: 'Tri-split', tag: 'Active', abilityTitle: 'Split', abilityDesc: 'Splits into 3 mini blue birds in a fan, each inheriting 1.15× velocity', usage: 'Scatter pig clusters or hit multiple targets' },
+      white: { name: 'White', desc: 'Precision bomber', tag: 'Unlimited', abilityTitle: 'Egg bomb (max 5 per bird, small blast)', abilityDesc: 'Each tap drops a heavy egg that explodes in 0.5s (radius 90px, ~half of black bird)', usage: 'Great for sniping single targets' },
+      green: { name: 'Green', desc: 'Boomerang', tag: 'Special', abilityTitle: 'Boomerang', abilityDesc: 'Instantly reverses flight direction (horizontal ×-1.4)', usage: 'Hit pigs behind or hidden inside' },
+      orange: { name: 'Orange', desc: 'Inflate impact', tag: 'Special', abilityTitle: 'Inflate', abilityDesc: 'Mass ×2.8 for 1s — massive impact force', usage: 'Slam stone walls or topple towers' },
+      purple: { name: 'Purple', desc: 'Sustained EMP + Linger', tag: 'Linger', abilityTitle: 'EMP (1.5s) + 2s extra life', abilityDesc: 'Radius 260px pulls objects inward; 150 damage per pulse', usage: '★ Lives 2 extra seconds after turn; re-trigger EMP' },
+    },
+    abilityHints: {
+      dash: 'Tap: Dash (chain)',
+      bomb: 'Tap: Bomb',
+      split: 'Tap: Split',
+      egg: 'Tap: Egg',
+      boomerang: 'Tap: Boomerang',
+      inflate: 'Tap: Inflate',
+      emp: 'Tap: EMP',
+    },
+  },
+};
+
+const LANG_STORAGE_KEY = 'angrybirds_lang';
+const SUPPORTED_LANGS = ['zh-TW', 'zh-CN', 'en'];
+const DEFAULT_LANG = 'zh-CN';
+
+let currentLang = DEFAULT_LANG;
+let T = TRANSLATIONS[currentLang];
+
+function loadLang() {
+  try {
+    const stored = localStorage.getItem(LANG_STORAGE_KEY);
+    if (stored && SUPPORTED_LANGS.includes(stored)) return stored;
+  } catch (e) {}
+  const nav = (navigator.language || '').toLowerCase();
+  if (nav.startsWith('zh-tw') || nav.startsWith('zh-hk') || nav.startsWith('zh-hant')) return 'zh-TW';
+  if (nav.startsWith('zh')) return 'zh-CN';
+  if (nav.startsWith('en')) return 'en';
+  return DEFAULT_LANG;
+}
+function saveLang(lang) {
+  try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch (e) {}
+}
+
+function setLang(lang) {
+  if (!SUPPORTED_LANGS.includes(lang)) return;
+  currentLang = lang;
+  T = TRANSLATIONS[lang];
+  saveLang(lang);
+  document.documentElement.lang = lang;
+  applyTranslations();
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  buildBirdGuide();
+  buildGuidePage();
+  if (!overlay.classList.contains('hidden')) {
+    const isWin = state === 'won';
+    showOverlay(
+      isWin ? T.youWin : T.gameOver,
+      score,
+      isWin ? T.nextLevel : T.retryLevel,
+      isWin
+    );
+  }
+  if (copySeedBtn) copySeedBtn.title = T.copyBtn;
+  // ★ 更新確認對話框的分數顯示
+  if (confirmDialog.classList.contains('visible')) {
+    confirmScore.textContent = totalScore.toString();
+  }
+}
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (T[key] !== undefined) {
+      el.textContent = T[key];
+    }
+  });
+}
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => setLang(btn.dataset.lang));
+});
+
 // ============================================================
 //  逻辑分辨率 & 常量
 // ============================================================
@@ -839,15 +1307,18 @@ const ovTitle = document.getElementById('ov-title');
 const ovText = document.getElementById('ov-text');
 const ovSeed = document.getElementById('ov-seed');
 const ovBtn = document.getElementById('ov-btn');
+const ovRestartBtn = document.getElementById('ov-restart-btn');
 const seedDisplay = document.getElementById('seed-display');
 const loadingEl = document.getElementById('loading');
 const copySeedBtn = document.getElementById('copy-seed-btn');
 const toastEl = document.getElementById('toast');
+const restartBtn = document.getElementById('restart-btn');
 
 const startScreen = document.getElementById('start-screen');
 const btnStart = document.getElementById('btn-start');
 const btnHelp = document.getElementById('btn-help');
 const btnSeed = document.getElementById('btn-seed');
+const btnRestart = document.getElementById('btn-restart');
 const seedPanel = document.getElementById('seed-panel');
 const seedInput = document.getElementById('seed-input');
 const seedGo = document.getElementById('seed-go');
@@ -859,6 +1330,16 @@ const helpClose = document.getElementById('help-close');
 const helpTabs = document.querySelectorAll('.help-tab');
 const helpPages = document.querySelectorAll('.help-page');
 const birdGrid = document.getElementById('bird-grid');
+const guideContent = document.getElementById('guide-content');
+const langSwitcher = document.getElementById('lang-switcher');
+
+// ★ 確認對話框
+const confirmDialog = document.getElementById('confirm-dialog');
+const confirmTitle = document.getElementById('confirm-title');
+const confirmMessage = document.getElementById('confirm-message');
+const confirmScore = document.getElementById('confirm-score');
+const confirmCancel = document.getElementById('confirm-cancel');
+const confirmOk = document.getElementById('confirm-ok');
 
 // ============================================================
 //  Toast
@@ -968,134 +1449,102 @@ const MATERIALS = {
 };
 
 // ============================================================
-//  8 种小鸟定义
+//  小鸟定义
 // ============================================================
 const BIRD_DEFS = {
-  red: {
-    color: '#e63946', accent: '#a01722', density: 0.012, ability: null,
-    name: '红鸟', desc: '最标准的小鸟',
-    icon: '🔴', tag: 'passive',
-    abilityTitle: '无特殊能力',
-    abilityDesc: '稳定的物理属性，血量中等，适合精准射击'
-  },
-  yellow: {
-    color: '#ffd23f', accent: '#d4a017', density: 0.011, ability: 'dash',
-    name: '黄鸟', desc: '三角冲刺专家',
-    icon: '🟡', tag: 'unlimited',
-    abilityTitle: '冲刺加速（可无限使用，自动结算豁免）',
-    abilityDesc: '每次点击都在当前方向叠加 12px/step 的速度（上限 40），可连续点击穿透多堵墙',
-    usage: '黄鸟是唯一不受 0.5 秒自动结算限制的鸟'
-  },
-  black: {
-    color: '#2b2b2b', accent: '#111', density: 0.014, ability: 'bomb',
-    name: '黑鸟', desc: '定时炸弹 + 延寿',
-    icon: '⚫', tag: 'linger',
-    abilityTitle: '爆炸（大范围）+ 额外存活 2 秒',
-    abilityDesc: '半径 180px 的冲击波，对范围内所有物体造成 500 伤害',
-    usage: '★ 本回合额外存活 2 秒，2 秒内可继续飞行'
-  },
-  blue: {
-    color: '#3a86ff', accent: '#1f5bb5', density: 0.010, ability: 'split',
-    name: '蓝鸟', desc: '三向分裂',
-    icon: '🔵', tag: 'active',
-    abilityTitle: '分裂',
-    abilityDesc: '分裂成 3 只小蓝鸟，扇面覆盖，每只继承 1.15x 速度',
-    usage: '打散小猪群或同时击中多目标'
-  },
-  white: {
-    color: '#f5f5f5', accent: '#b0b0b0', density: 0.013, ability: 'egg',
-    name: '白鸟', desc: '小范围精准空投',
-    icon: '⚪', tag: 'unlimited',
-    abilityTitle: '投蛋（每只鸟最多 5 次，小范围爆炸）',
-    abilityDesc: '每次点击投下重蛋（0.5 秒爆炸，半径 90px，约为黑鸟的一半）',
-    usage: '适合精准打击单个目标'
-  },
-  green: {
-    color: '#5cb85c', accent: '#2d6a2d', density: 0.011, ability: 'boomerang',
-    name: '绿鸟', desc: '回旋镖',
-    icon: '🟢', tag: 'special',
-    abilityTitle: '回旋',
-    abilityDesc: '瞬间反向飞行，水平速度变为 -1.4 倍',
-    usage: '打击背后或内部的小猪'
-  },
-  orange: {
-    color: '#ff8c42', accent: '#c45a1a', density: 0.010, ability: 'inflate',
-    name: '橙鸟', desc: '膨胀冲击',
-    icon: '🟠', tag: 'special',
-    abilityTitle: '膨胀',
-    abilityDesc: '质量变为 2.8 倍持续 1 秒，冲击力极大',
-    usage: '重击石头墙或撞倒整座塔'
-  },
-  purple: {
-    color: '#9b59b6', accent: '#6b3a80', density: 0.011, ability: 'emp',
-    name: '紫鸟', desc: '持续电磁场 + 延寿',
-    icon: '🟣', tag: 'linger',
-    abilityTitle: '电磁脉冲（持续 1.5 秒）+ 额外存活 2 秒',
-    abilityDesc: '半径 260px 内持续吸引物体，每次脉冲造成 150 伤害',
-    usage: '★ 本回合额外存活 2 秒，可再次触发 EMP'
-  }
+  red:    { color: '#e63946', accent: '#a01722', density: 0.012, ability: null,        icon: '🔴', tagType: 'passive' },
+  yellow: { color: '#ffd23f', accent: '#d4a017', density: 0.011, ability: 'dash',      icon: '🟡', tagType: 'unlimited' },
+  black:  { color: '#2b2b2b', accent: '#111',    density: 0.014, ability: 'bomb',      icon: '⚫', tagType: 'linger' },
+  blue:   { color: '#3a86ff', accent: '#1f5bb5', density: 0.010, ability: 'split',     icon: '🔵', tagType: 'active' },
+  white:  { color: '#f5f5f5', accent: '#b0b0b0', density: 0.013, ability: 'egg',       icon: '⚪', tagType: 'unlimited' },
+  green:  { color: '#5cb85c', accent: '#2d6a2d', density: 0.011, ability: 'boomerang', icon: '🟢', tagType: 'special' },
+  orange: { color: '#ff8c42', accent: '#c45a1a', density: 0.010, ability: 'inflate',   icon: '🟠', tagType: 'special' },
+  purple: { color: '#9b59b6', accent: '#6b3a80', density: 0.011, ability: 'emp',       icon: '🟣', tagType: 'linger' }
 };
 
-const ABILITY_HINTS = {
-  dash: '点击：冲刺 (可连点)',
-  bomb: '点击：爆炸',
-  split: '点击：分裂',
-  egg: '点击：投蛋',
-  boomerang: '点击：回旋',
-  inflate: '点击：膨胀',
-  emp: '点击：电磁'
-};
-
-// ============================================================
-//  动态生成小鸟图鉴
-// ============================================================
 function buildBirdGuide() {
   birdGrid.innerHTML = '';
+  const tagClassMap = {
+    passive: 'tag-passive', active: 'tag-active',
+    special: 'tag-special', unlimited: 'tag-unlimited', linger: 'tag-linger',
+  };
   for (const [key, def] of Object.entries(BIRD_DEFS)) {
+    const tr = T.birds[key] || {};
     const card = document.createElement('div');
     card.className = 'bird-card';
     card.style.setProperty('--bird-color', def.color);
-
-    let tagClass = 'tag-passive';
-    let tagText = '基础';
-    if (def.tag === 'active') { tagClass = 'tag-active'; tagText = '主动'; }
-    else if (def.tag === 'special') { tagClass = 'tag-special'; tagText = '特殊'; }
-    else if (def.tag === 'unlimited') { tagClass = 'tag-unlimited'; tagText = '无限'; }
-    else if (def.tag === 'linger') { tagClass = 'tag-linger'; tagText = '延寿'; }
-
     card.innerHTML = `
       <div class="bird-card-header">
         <div class="bird-avatar" style="background:linear-gradient(135deg, ${def.color}, ${def.accent}); color:#fff;">
           ${def.icon}
         </div>
         <div class="bird-name-wrap">
-          <div class="bird-name">${def.name}</div>
-          <div class="bird-tag ${tagClass}">${tagText}</div>
+          <div class="bird-name">${tr.name || key}</div>
+          <div class="bird-tag ${tagClassMap[def.tagType] || 'tag-passive'}">${tr.tag || ''}</div>
         </div>
       </div>
-      <div class="bird-desc">${def.desc}</div>
+      <div class="bird-desc">${tr.desc || ''}</div>
       <div class="bird-ability-box">
-        <div class="bird-ability-label">能 力</div>
-        <div class="bird-ability-text">${def.abilityTitle}</div>
-        <div style="font-size:12px; opacity:.7; margin-top:4px;">${def.abilityDesc}</div>
+        <div class="bird-ability-label">${currentLang === 'en' ? 'ABILITY' : '能 力'}</div>
+        <div class="bird-ability-text">${tr.abilityTitle || ''}</div>
+        <div style="font-size:12px; opacity:.7; margin-top:4px;">${tr.abilityDesc || ''}</div>
       </div>
-      ${def.usage ? `<div class="bird-usage">${def.usage}</div>` : ''}
+      ${tr.usage ? `<div class="bird-usage">${tr.usage}</div>` : ''}
     `;
-
     card.addEventListener('click', () => {
       const avatar = card.querySelector('.bird-avatar');
       if (!avatar) return;
       avatar.style.transform = 'scale(1.25) rotate(-15deg)';
       setTimeout(() => { avatar.style.transform = ''; }, 250);
     });
-
     birdGrid.appendChild(card);
   }
 }
 
-// ============================================================
-//  玩法页交互
-// ============================================================
+function buildGuidePage() {
+  const g = T.guide;
+  guideContent.innerHTML = `
+    <div class="guide-section">
+      <h3>${g.goalTitle}</h3>
+      <div class="guide-steps">
+        <div class="guide-step"><div class="step-num">1</div><div class="step-text">${g.goal1}</div></div>
+        <div class="guide-step"><div class="step-num">2</div><div class="step-text">${g.goal2}</div></div>
+        <div class="guide-step"><div class="step-num">3</div><div class="step-text">${g.goal3}</div></div>
+        <div class="guide-step"><div class="step-num">4</div><div class="step-text">${g.goal4}</div></div>
+        <div class="guide-step"><div class="step-num" style="background:linear-gradient(135deg,#7dd3ff,#3a86ff);">📊</div><div class="step-text">${g.goal5}</div></div>
+        <div class="guide-step"><div class="step-num" style="background:linear-gradient(135deg,#ff4757,#c0143c);">🔄</div><div class="step-text">${g.goal6}</div></div>
+      </div>
+    </div>
+    <div class="guide-section">
+      <h3>${g.opsTitle}</h3>
+      <div class="guide-grid">
+        <div class="guide-card"><div class="kbd">${currentLang==='en'?'Drag':'拖拽'}</div><div class="desc">${g.opDrag}</div></div>
+        <div class="guide-card"><div class="kbd">${currentLang==='en'?'Release':'松手'}</div><div class="desc">${g.opRelease}</div></div>
+        <div class="guide-card"><div class="kbd">${currentLang==='en'?'Click':'点击'}</div><div class="desc">${g.opClick}</div></div>
+        <div class="guide-card"><div class="kbd">${currentLang==='en'?'Space':'空格'}</div><div class="desc">${g.opSpace}</div></div>
+        <div class="guide-card"><div class="kbd">R</div><div class="desc">${g.opR}</div></div>
+        <div class="guide-card"><div class="kbd">N</div><div class="desc">${g.opN}</div></div>
+        <div class="guide-card"><div class="kbd">🔄</div><div class="desc">${g.opRestart}</div></div>
+      </div>
+    </div>
+    <div class="guide-section">
+      <h3>${g.scoreTitle}</h3>
+      <div class="guide-steps">
+        <div class="guide-step"><div class="step-num" style="background:linear-gradient(135deg,#5cb85c,#2d6a2d);">🐷</div><div class="step-text">${g.score1}</div></div>
+        <div class="guide-step"><div class="step-num" style="background:linear-gradient(135deg,#c8843c,#7a4a1e);">🧱</div><div class="step-text">${g.score2}</div></div>
+        <div class="guide-step"><div class="step-num" style="background:linear-gradient(135deg,#ffd23f,#d4a017);">🐦</div><div class="step-text">${g.score3}</div></div>
+        <div class="guide-step"><div class="step-num" style="background:linear-gradient(135deg,#7dd3ff,#3a86ff);">📊</div><div class="step-text">${g.score4}</div></div>
+      </div>
+    </div>
+    <div class="guide-section">
+      <h3>${g.matTitle}</h3>
+      <div class="material-row"><div class="material-swatch" style="background:#c8843c;"></div><div class="material-info">${g.matWood}</div></div>
+      <div class="material-row"><div class="material-swatch" style="background:#a8e6ff;"></div><div class="material-info">${g.matIce}</div></div>
+      <div class="material-row"><div class="material-swatch" style="background:#8b8d99;"></div><div class="material-info">${g.matStone}</div></div>
+    </div>
+  `;
+}
+
 function openHelp(tab = 'guide') {
   helpScreen.classList.add('visible');
   switchHelpTab(tab);
@@ -1175,7 +1624,7 @@ function renderSeedHistory() {
     chip.className = 'seed-chip';
     chip.type = 'button';
     chip.textContent = seedToText(s);
-    chip.title = '点击开始此种子';
+    chip.title = T.seedHint;
     chip.addEventListener('click', () => {
       seedInput.value = seedToText(s);
       seedError.textContent = '';
@@ -1297,9 +1746,6 @@ function overlapsX(a, b, margin = 20) {
   return aMax + margin > bMin && bMax + margin > aMin;
 }
 
-// ============================================================
-//  关卡生成
-// ============================================================
 function getBirdPool(level) {
   if (level < 1) return ['red', 'red', 'red'];
   if (level < 2) return ['red', 'red', 'yellow', 'black'];
@@ -1457,7 +1903,6 @@ let birdStillTimer = 0;
 let birdExtraLifeTimer = 0;
 let birdMaxExtraLife = 0;
 
-// ★ 新增：总分（跨关卡累积，实时累加，不持久化）
 let totalScore = 0;
 
 let score = 0;
@@ -1475,7 +1920,6 @@ let gameStarted = false;
 let empWaves = [];
 let eggs = [];
 
-// ★ 统一的加分函数：同时加到本关分数和总分
 function addScore(pts) {
   score += pts;
   totalScore += pts;
@@ -1508,9 +1952,6 @@ function addPig(x, y, r) {
   return body;
 }
 
-// ============================================================
-//  伤害 & 移除
-// ============================================================
 const DAMAGE_THRESHOLD = 6;
 const DAMAGE_FACTOR = 2.6;
 function effectiveMass(a, b) {
@@ -1552,14 +1993,12 @@ function processRemovals() {
     if (body.gameType === 'pig') {
       spawnPoofParticles(x, y, 22, '#9be15d');
       addFloater(x, y, '+1000', '#ffe74c');
-      // ★ 使用 addScore：实时累加总分
       addScore(1000);
       playPigPopSound();
     } else if (body.gameType === 'block') {
       const color = MATERIALS[body.material].color;
       spawnDebrisParticles(x, y, body.w, body.h, color, body.material);
       playBlockBreakSound(body.material);
-      // ★ 使用 addScore
       addScore(50);
     }
     Composite.remove(world, body);
@@ -1600,9 +2039,6 @@ function checkEscapees() {
   }
 }
 
-// ============================================================
-//  粒子 & 飘字
-// ============================================================
 class ParticleSystem {
   constructor() { this.list = []; }
   burst(x, y, count, color, opts = {}) {
@@ -1660,9 +2096,6 @@ function drawFloaters(ctx) {
   ctx.globalAlpha = 1; ctx.textAlign = 'left';
 }
 
-// ============================================================
-//  音效
-// ============================================================
 let audioCtx = null;
 function initAudio() {
   if (audioCtx) return;
@@ -1716,7 +2149,6 @@ function applyTemplate(template) {
   birdMaxExtraLife = 0;
   dragPos = { x: SLING_X, y: SLING_Y };
   flyingTime = 0; endTurnTimer = 0; canSkipTurn = false;
-  // ★ 注意：score = 0 只清本关分数，totalScore 保留（跨关卡累积）
   score = 0;
 
   for (const p of template.parts) {
@@ -1763,7 +2195,11 @@ function loadLevel(seed, level) {
 }
 
 function nextLevel() { if (!isGenerating) loadLevel(currentSeed, levelIndex + 1); }
-function newGame() { if (!isGenerating) loadLevel(makeSeed(), 0); }
+function newGame() {
+  if (isGenerating) return;
+  // 用全新種子，第 0 關，但不清除 totalScore（這是「新關卡」不是「重新開始」）
+  loadLevel(makeSeed(), 0);
+}
 function retryLevel() { if (!isGenerating) loadLevel(currentSeed, levelIndex); }
 
 function startWithSeed(seed) {
@@ -1771,9 +2207,101 @@ function startWithSeed(seed) {
   gameStarted = true;
   hideStartScreen();
   copySeedBtn.classList.add('visible');
+  langSwitcher.classList.add('in-game');
+  restartBtn.classList.add('visible');
   loadLevel(seed, 0);
 }
 function startWithNewSeed() { startWithSeed(makeSeed()); }
+
+// ============================================================
+//  ★ 重新開始（完全重置）
+// ============================================================
+function resetGame() {
+  if (isGenerating) return;
+
+  // 完全重置所有狀態
+  totalScore = 0;
+  score = 0;
+  levelIndex = 0;
+  currentSeed = 0;
+  birdsLeft = [];
+  birdBody = null;
+  birdUsedAbility = false;
+  birdAbilityCooldown = 0;
+  birdEggsUsed = 0;
+  birdStillTimer = 0;
+  birdExtraLifeTimer = 0;
+  birdMaxExtraLife = 0;
+  dragPos = { x: SLING_X, y: SLING_Y };
+  flyingTime = 0;
+  endTurnTimer = 0;
+  floaters = [];
+  removalQueue = [];
+  empWaves = [];
+  eggs = [];
+  canSkipTurn = false;
+  dragging = false;
+  state = 'aiming';
+  gameStarted = false;
+
+  // 清空物理世界
+  clearDynamicBodies();
+
+  // 隱藏所有 overlay / UI 元素
+  hideOverlay();
+  copySeedBtn.classList.remove('visible');
+  restartBtn.classList.remove('visible');
+  langSwitcher.classList.remove('in-game');
+  seedDisplay.textContent = '';
+
+  // 回到開始頁
+  startScreen.classList.remove('hidden');
+}
+
+// ★ 點擊「重新開始」→ 彈出確認對話框
+function requestRestart() {
+  if (isGenerating) return;
+  // 只有當有進度時才需要確認
+  if (totalScore > 0 || gameStarted) {
+    confirmTitle.textContent = gameStarted ? T.confirmTitle : T.confirmStartTitle;
+    confirmMessage.innerHTML =
+      `<span>${gameStarted ? T.confirmMessage : T.confirmStartMessage}</span> ` +
+      `<b id="confirm-score">${totalScore}</b> ` +
+      `<span>${gameStarted ? T.confirmMessage2 : T.confirmStartMessage2}</span>`;
+    confirmDialog.classList.add('visible');
+  } else {
+    // 沒有進度，直接重來
+    resetGame();
+  }
+}
+
+confirmCancel.addEventListener('click', () => {
+  confirmDialog.classList.remove('visible');
+});
+confirmOk.addEventListener('click', () => {
+  confirmDialog.classList.remove('visible');
+  resetGame();
+});
+// 點擊背景也可關閉
+confirmDialog.addEventListener('click', (e) => {
+  if (e.target === confirmDialog) {
+    confirmDialog.classList.remove('visible');
+  }
+});
+
+// 綁定重新開始按鈕
+btnRestart.addEventListener('click', requestRestart);
+restartBtn.addEventListener('click', requestRestart);
+ovRestartBtn.addEventListener('click', requestRestart);
+
+// 顯示/隱藏開始頁的「重新開始」按鈕（有進度時才顯示）
+function updateRestartVisibility() {
+  if (totalScore > 0) {
+    btnRestart.classList.add('visible');
+  } else {
+    btnRestart.classList.remove('visible');
+  }
+}
 
 // ============================================================
 //  弹弓 / 发射
@@ -1823,69 +2351,39 @@ function forceSkipTurn() {
   endTurn();
 }
 
-// ============================================================
-//  特殊能力
-// ============================================================
 function triggerAbility() {
   if (!birdBody) return;
-
   const def = BIRD_DEFS[birdBody.birdType];
   if (!def.ability) return;
-
   const isUnlimited = UNLIMITED_ABILITY_BIRDS.includes(birdBody.birdType);
-
   if (!isUnlimited && birdUsedAbility) return;
   if (isUnlimited && birdAbilityCooldown > 0) return;
-
   const ab = def.ability;
-
-  if (ab === 'egg') {
-    if (birdEggsUsed >= MAX_EGGS_PER_BIRD) {
-      return;
-    }
-  }
-
+  if (ab === 'egg' && birdEggsUsed >= MAX_EGGS_PER_BIRD) return;
   birdUsedAbility = true;
   if (isUnlimited) birdAbilityCooldown = Math.max(1, Math.round(ABILITY_COOLDOWN_MS / FIXED_DT));
 
   if (ab === 'dash') {
     const v = birdBody.velocity;
     const len = Math.hypot(v.x, v.y) || 1;
-    const curSpeed = len;
-    const newSpeed = Math.min(curSpeed + 12, MAX_DASH_SPEED);
-    Body.setVelocity(birdBody, {
-      x: (v.x / len) * newSpeed,
-      y: (v.y / len) * newSpeed
-    });
+    const newSpeed = Math.min(len + 12, MAX_DASH_SPEED);
+    Body.setVelocity(birdBody, { x: (v.x / len) * newSpeed, y: (v.y / len) * newSpeed });
     birdStillTimer = 0;
     spawnImpactParticles(birdBody.position.x, birdBody.position.y, 12);
     for (let i = 0; i < 10; i++) {
-      particlesSys.burst(
-        birdBody.position.x + (Math.random() - 0.5) * 12,
-        birdBody.position.y + (Math.random() - 0.5) * 12,
-        1, '#ffe74c', { speedMin: 2, speedMax: 6, sizeMax: 4 }
-      );
+      particlesSys.burst(birdBody.position.x + (Math.random() - 0.5) * 12, birdBody.position.y + (Math.random() - 0.5) * 12, 1, '#ffe74c', { speedMin: 2, speedMax: 6, sizeMax: 4 });
     }
-    particlesSys.burst(
-      birdBody.position.x - v.x * 1.5,
-      birdBody.position.y - v.y * 1.5,
-      6, '#ffd23f', { speedMin: 1, speedMax: 3, sizeMax: 3, life: 0.6 }
-    );
     playAbilitySound();
-
   } else if (ab === 'bomb') {
     explode(birdBody.position.x, birdBody.position.y, 180, 1600);
     Composite.remove(world, birdBody);
     birdBody = null;
     playAbilitySound();
-
   } else if (ab === 'split') {
     const v = birdBody.velocity;
     const base = birdBody.position;
     for (let i = -1; i <= 1; i++) {
-      const b = Bodies.circle(base.x, base.y, 9, {
-        density: 0.008, friction: 0.85, frictionAir: 0.006, restitution: 0.3, label: 'bird'
-      });
+      const b = Bodies.circle(base.x, base.y, 9, { density: 0.008, friction: 0.85, frictionAir: 0.006, restitution: 0.3, label: 'bird' });
       b.gameType = 'bird'; b.birdType = 'blue'; b.baseRadius = 9;
       const ang = Math.atan2(v.y, v.x) + i * 0.35;
       const sp = Math.hypot(v.x, v.y) * 1.15;
@@ -1895,7 +2393,6 @@ function triggerAbility() {
     Composite.remove(world, birdBody);
     birdBody = null;
     playAbilitySound();
-
   } else if (ab === 'egg') {
     if (eggs.length >= MAX_EGGS_ALIVE) {
       if (!isUnlimited) birdUsedAbility = false;
@@ -1904,39 +2401,24 @@ function triggerAbility() {
     }
     const p = birdBody.position;
     const v = birdBody.velocity;
-    const egg = Bodies.circle(p.x, p.y + 25, 11, {
-      density: 0.025, friction: 0.6, frictionAir: 0.005,
-      restitution: 0.15, label: 'egg'
-    });
+    const egg = Bodies.circle(p.x, p.y + 25, 11, { density: 0.025, friction: 0.6, frictionAir: 0.005, restitution: 0.15, label: 'egg' });
     egg.gameType = 'egg';
     egg.timer = 60;
     Body.setVelocity(egg, { x: v.x * 0.3, y: Math.max(v.y * 0.3, 4) });
     Composite.add(world, egg);
     eggs.push(egg);
     birdEggsUsed++;
-    Body.setVelocity(birdBody, {
-      x: v.x * 0.6,
-      y: -Math.abs(v.y) * 0.8 - 5
-    });
+    Body.setVelocity(birdBody, { x: v.x * 0.6, y: -Math.abs(v.y) * 0.8 - 5 });
     birdStillTimer = 0;
     spawnImpactParticles(p.x, p.y + 20, 10);
     playAbilitySound();
-
-    if (birdEggsUsed >= MAX_EGGS_PER_BIRD) {
-      addFloater(p.x, p.y - 30, '蛋已用尽!', '#ff8b8b');
-    }
-
+    if (birdEggsUsed >= MAX_EGGS_PER_BIRD) addFloater(p.x, p.y - 30, T.hudEggsExhausted + '!', '#ff8b8b');
   } else if (ab === 'boomerang') {
     const v = birdBody.velocity;
     Body.setVelocity(birdBody, { x: -v.x * 1.4, y: -v.y * 0.6 });
     birdStillTimer = 0;
-    for (let i = 0; i < 20; i++) {
-      particlesSys.burst(birdBody.position.x, birdBody.position.y, 1, '#5cb85c',
-        { speedMin: 4, speedMax: 9, sizeMax: 5 });
-    }
-    playTone(600, 0.2, 'triangle', 0.1, 300);
+    for (let i = 0; i < 20; i++) particlesSys.burst(birdBody.position.x, birdBody.position.y, 1, '#5cb85c', { speedMin: 4, speedMax: 9, sizeMax: 5 });
     playAbilitySound();
-
   } else if (ab === 'inflate') {
     birdBody.baseRadius = BIRD_R;
     birdBody.inflated = true;
@@ -1944,35 +2426,16 @@ function triggerAbility() {
     Body.setMass(birdBody, birdBody.mass * 2.8);
     birdRadius = BIRD_R * 2.4;
     birdStillTimer = 0;
-    for (let i = 0; i < 30; i++) {
-      particlesSys.burst(birdBody.position.x, birdBody.position.y, 1, '#ff8c42',
-        { speedMin: 5, speedMax: 14, sizeMax: 8 });
-    }
-    playTone(200, 0.3, 'sawtooth', 0.15, 400);
+    for (let i = 0; i < 30; i++) particlesSys.burst(birdBody.position.x, birdBody.position.y, 1, '#ff8c42', { speedMin: 5, speedMax: 14, sizeMax: 8 });
     playAbilitySound();
-
   } else if (ab === 'emp') {
     const p = birdBody.position;
-    empWaves.push({
-      x: p.x, y: p.y,
-      radius: 0,
-      maxRadius: 260,
-      life: 1.5,
-      maxLife: 1.5,
-      pulseAccum: 0,
-      pulseInterval: 0.25,
-      damagePerPulse: 150
-    });
+    empWaves.push({ x: p.x, y: p.y, radius: 0, maxRadius: 260, life: 1.5, maxLife: 1.5, pulseAccum: 0, pulseInterval: 0.25, damagePerPulse: 150 });
     birdStillTimer = 0;
     for (let i = 0; i < 30; i++) {
       const ang = (i / 30) * Math.PI * 2;
-      particlesSys.burst(
-        p.x + Math.cos(ang) * 20,
-        p.y + Math.sin(ang) * 20,
-        2, '#c39bd3', { speedMin: 4, speedMax: 12, sizeMax: 7, gravity: 0.1 }
-      );
+      particlesSys.burst(p.x + Math.cos(ang) * 20, p.y + Math.sin(ang) * 20, 2, '#c39bd3', { speedMin: 4, speedMax: 12, sizeMax: 7, gravity: 0.1 });
     }
-    playTone(300, 0.8, 'sine', 0.12, 600);
     playAbilitySound();
     birdUsedAbility = false;
   }
@@ -1982,10 +2445,8 @@ function processEmpPulses() {
   for (const wave of empWaves) {
     if (wave.pulseAccum === undefined) wave.pulseAccum = 0;
     wave.pulseAccum += 1 / 60;
-
     if (wave.pulseAccum >= wave.pulseInterval && wave.life > 0.1) {
       wave.pulseAccum -= wave.pulseInterval;
-
       for (const body of Composite.allBodies(world)) {
         if (body.isStatic || body === birdBody) continue;
         if (body.gameType !== 'block' && body.gameType !== 'pig') continue;
@@ -2025,15 +2486,10 @@ function explode(x, y, radius, force) {
   }
 }
 
-// ============================================================
-//  回合结束
-// ============================================================
 function endTurn() {
   if (birdBody) { try { Composite.remove(world, birdBody); } catch (e) {} birdBody = null; }
   for (const b of Composite.allBodies(world)) {
-    if (b.gameType === 'bird' || b.gameType === 'egg') {
-      try { Composite.remove(world, b); } catch (e) {}
-    }
+    if (b.gameType === 'bird' || b.gameType === 'egg') { try { Composite.remove(world, b); } catch (e) {} }
   }
   eggs = [];
   birdUsedAbility = false;
@@ -2045,20 +2501,19 @@ function endTurn() {
   dragging = false;
   dragPos = { x: SLING_X, y: SLING_Y };
   canSkipTurn = false;
-
   checkEscapees();
-
   const pigs = Composite.allBodies(world).filter(b => b.gameType === 'pig' && !b.dead);
   if (pigs.length === 0) {
     state = 'won';
-    // ★ 剩余小鸟奖励也加到总分
     addScore(birdsLeft.length * 500);
-    setTimeout(() => showOverlay('YOU WIN!', score, '下一关', true), 500);
+    updateRestartVisibility();
+    setTimeout(() => showOverlay(T.youWin, score, T.nextLevel, true), 500);
     return;
   }
   if (birdsLeft.length === 0) {
     state = 'lost';
-    setTimeout(() => showOverlay('GAME OVER', score, '重试本关', false), 500);
+    updateRestartVisibility();
+    setTimeout(() => showOverlay(T.gameOver, score, T.retryLevel, false), 500);
     return;
   }
   state = 'aiming';
@@ -2066,22 +2521,15 @@ function endTurn() {
   endTurnTimer = 0;
 }
 
-// ============================================================
-//  输入
-// ============================================================
 function canvasPos(e) {
   const r = canvas.getBoundingClientRect();
-  return {
-    x: (e.clientX - r.left) * (W / r.width),
-    y: (e.clientY - r.top) * (H / r.height)
-  };
+  return { x: (e.clientX - r.left) * (W / r.width), y: (e.clientY - r.top) * (H / r.height) };
 }
 function hitSkipButton(p) {
   if (!canSkipTurn || !skipButtonBounds) return false;
   const b = skipButtonBounds;
   return p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h;
 }
-
 canvas.addEventListener('mousedown', (e) => {
   initAudio();
   if (isGenerating || !gameStarted) return;
@@ -2134,6 +2582,11 @@ canvas.addEventListener('touchend', () => {
 }, { passive: false });
 
 window.addEventListener('keydown', (e) => {
+  if (confirmDialog.classList.contains('visible')) {
+    if (e.key === 'Escape') { confirmDialog.classList.remove('visible'); }
+    else if (e.key === 'Enter') { confirmDialog.classList.remove('visible'); resetGame(); }
+    return;
+  }
   if (helpScreen.classList.contains('visible')) {
     if (e.key === 'Escape') { e.preventDefault(); closeHelp(); }
     return;
@@ -2158,23 +2611,12 @@ window.addEventListener('keydown', (e) => {
     if (state === 'flying') {
       const canUseAbility = birdBody && BIRD_DEFS[birdBody.birdType].ability &&
         (UNLIMITED_ABILITY_BIRDS.includes(birdBody.birdType) || !birdUsedAbility);
-      if (canUseAbility) {
-        triggerAbility();
-      } else {
-        forceSkipTurn();
-      }
+      if (canUseAbility) triggerAbility();
+      else forceSkipTurn();
     }
   }
 });
 
-// ============================================================
-//  开始页面
-// ============================================================
-function showStartScreen() {
-  startScreen.classList.remove('hidden');
-  copySeedBtn.classList.remove('visible');
-  gameStarted = false;
-}
 function hideStartScreen() { startScreen.classList.add('hidden'); }
 function collapseSeedPanel() {
   seedPanel.classList.add('collapsed');
@@ -2188,12 +2630,12 @@ function expandSeedPanel() {
 }
 function submitSeedInput() {
   const raw = seedInput.value.trim();
-  if (!raw) { seedError.textContent = '请输入种子'; return; }
+  if (!raw) { seedError.textContent = T.seedErrorEmpty; return; }
   const clean = raw.toUpperCase().replace(/[^0-9A-Z]/g, '');
-  if (clean.length === 0) { seedError.textContent = '只能包含 0-9 和 A-Z'; return; }
-  if (clean.length > 5) { seedError.textContent = '最多 5 个字符'; return; }
+  if (clean.length === 0) { seedError.textContent = T.seedErrorChars; return; }
+  if (clean.length > 5) { seedError.textContent = T.seedErrorLong; return; }
   const seed = textToSeed(clean);
-  if (!seed) { seedError.textContent = '无效种子，请重试'; return; }
+  if (!seed) { seedError.textContent = T.seedErrorInvalid; return; }
   seedError.textContent = '';
   startWithSeed(seed);
 }
@@ -2224,27 +2666,21 @@ copySeedBtn.addEventListener('click', async () => {
       document.execCommand('copy');
       document.body.removeChild(ta);
     }
-    showToast(`已复制种子 ${text}`, 'success');
+    showToast(`${T.copied} ${text}`, 'success');
     copySeedBtn.classList.add('copied');
     setTimeout(() => copySeedBtn.classList.remove('copied'), 1200);
   } catch (err) {
-    showToast('复制失败，请手动记下: ' + text, 'error');
+    showToast(T.copyFail + text, 'error');
   }
 });
 
-// ============================================================
-//  Overlay（★ 显示本关分数 + 总分）
-// ============================================================
 function showOverlay(title, levelScore, btnText, isWin) {
   ovTitle.textContent = title;
-  ovTitle.style.background = !isWin
-    ? 'linear-gradient(135deg,#ff4b4b,#c0143c)'
-    : 'linear-gradient(135deg,#ffd23f,#ff6b35)';
+  ovTitle.style.background = !isWin ? 'linear-gradient(135deg,#ff4b4b,#c0143c)' : 'linear-gradient(135deg,#ffd23f,#ff6b35)';
   ovTitle.style.webkitBackgroundClip = 'text';
   ovTitle.style.backgroundClip = 'text';
-  // ★ 显示本关分数和总分
-  ovText.innerHTML = `本关分数: <b>${levelScore}</b>　·　总分: <b class="total">${totalScore}</b>`;
-  ovSeed.textContent = `Seed ${seedToText(currentSeed)} · 关卡 ${levelIndex + 1}`;
+  ovText.innerHTML = `${T.levelScore}: <b>${levelScore}</b>　·　${T.totalScore}: <b class="total">${totalScore}</b>`;
+  ovSeed.textContent = `Seed ${seedToText(currentSeed)} · ${T.hudLevel} ${levelIndex + 1}`;
   ovBtn.textContent = btnText;
   overlay.classList.remove('hidden');
 }
@@ -2256,9 +2692,6 @@ ovBtn.addEventListener('click', () => {
   else retryLevel();
 });
 
-// ============================================================
-//  轨迹预测 & 天空
-// ============================================================
 function predictTrajectory(sx, sy, vx, vy) {
   const pts = [];
   let x = sx, y = sy, ax = vx, ay = vy;
@@ -2307,9 +2740,6 @@ skyCanvas.width = W; skyCanvas.height = H;
   c.lineTo(W, GROUND_Y); c.fill();
 })();
 
-// ============================================================
-//  绘制
-// ============================================================
 function drawGround() {
   const g = ctx.createLinearGradient(0, GROUND_Y, 0, H);
   g.addColorStop(0, '#7dbb4f'); g.addColorStop(0.15, '#5a9138'); g.addColorStop(1, '#3d6626');
@@ -2345,26 +2775,18 @@ function drawBandFront() {
   ctx.strokeStyle = '#3a1f0a'; ctx.lineWidth = 6; ctx.lineCap = 'round';
   ctx.beginPath(); ctx.moveTo(232, 512); ctx.lineTo(b.x, b.y); ctx.stroke();
 }
-
 function drawBird(ctx, x, y, type, angle = 0, radius = BIRD_R) {
   const def = BIRD_DEFS[type] || BIRD_DEFS.red;
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(angle);
+  ctx.save(); ctx.translate(x, y); ctx.rotate(angle);
   const r = radius;
-
   ctx.fillStyle = 'rgba(0,0,0,.15)';
   ctx.beginPath(); ctx.ellipse(0, r + 4, r * 0.9, r * 0.3, 0, 0, Math.PI * 2); ctx.fill();
-
   const grad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.2, 0, 0, r);
-  grad.addColorStop(0, def.color);
-  grad.addColorStop(1, def.accent);
+  grad.addColorStop(0, def.color); grad.addColorStop(1, def.accent);
   ctx.fillStyle = grad;
   ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
-
   ctx.fillStyle = 'rgba(255,240,200,.85)';
   ctx.beginPath(); ctx.arc(-1, r * 0.3, r * 0.5, 0, Math.PI * 2); ctx.fill();
-
   if (type === 'white') {
     ctx.fillStyle = 'rgba(255,255,255,.5)';
     ctx.beginPath(); ctx.arc(-r * 0.3, -r * 0.5, r * 0.35, 0, Math.PI * 2); ctx.fill();
@@ -2372,75 +2794,40 @@ function drawBird(ctx, x, y, type, angle = 0, radius = BIRD_R) {
     ctx.fillStyle = def.accent;
     for (let i = -2; i <= 2; i++) {
       ctx.beginPath();
-      ctx.moveTo(i * r * 0.18, -r * 0.9);
-      ctx.lineTo(i * r * 0.18 + r * 0.1, -r * 1.35);
-      ctx.lineTo(i * r * 0.18 + r * 0.2, -r * 0.9);
-      ctx.closePath();
-      ctx.fill();
+      ctx.moveTo(i * r * 0.18, -r * 0.9); ctx.lineTo(i * r * 0.18 + r * 0.1, -r * 1.35); ctx.lineTo(i * r * 0.18 + r * 0.2, -r * 0.9);
+      ctx.closePath(); ctx.fill();
     }
   } else if (type === 'orange') {
     ctx.fillStyle = 'rgba(255,200,0,.4)';
-    ctx.beginPath();
-    ctx.arc(0, 0, r * 0.85, -Math.PI * 0.9, -Math.PI * 0.1);
-    ctx.lineTo(0, 0);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.85, -Math.PI * 0.9, -Math.PI * 0.1); ctx.lineTo(0, 0); ctx.fill();
   } else if (type === 'purple') {
     ctx.fillStyle = 'rgba(255,255,255,.7)';
     for (let i = 0; i < 5; i++) {
       const ang = (i / 5) * Math.PI * 2;
-      const sx = Math.cos(ang) * r * 0.7;
-      const sy = Math.sin(ang) * r * 0.7;
-      ctx.beginPath();
-      ctx.arc(sx, sy, r * 0.08, 0, Math.PI * 2);
-      ctx.fill();
+      const sx = Math.cos(ang) * r * 0.7, sy = Math.sin(ang) * r * 0.7;
+      ctx.beginPath(); ctx.arc(sx, sy, r * 0.08, 0, Math.PI * 2); ctx.fill();
     }
   } else if (type === 'blue') {
     ctx.fillStyle = def.accent;
-    ctx.beginPath();
-    ctx.moveTo(-r * 0.15, -r);
-    ctx.lineTo(-r * 0.05, -r * 1.25);
-    ctx.lineTo(r * 0.05, -r);
-    ctx.closePath();
-    ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-r * 0.15, -r); ctx.lineTo(-r * 0.05, -r * 1.25); ctx.lineTo(r * 0.05, -r); ctx.closePath(); ctx.fill();
   }
-
   ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.arc(r * 0.22, -r * 0.3, r * 0.33, 0, Math.PI * 2);
-  ctx.arc(-r * 0.28, -r * 0.3, r * 0.3, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(r * 0.22, -r * 0.3, r * 0.33, 0, Math.PI * 2); ctx.arc(-r * 0.28, -r * 0.3, r * 0.3, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = '#111';
-  ctx.beginPath();
-  ctx.arc(r * 0.28, -r * 0.3, r * 0.16, 0, Math.PI * 2);
-  ctx.arc(-r * 0.24, -r * 0.3, r * 0.14, 0, Math.PI * 2);
-  ctx.fill();
-
+  ctx.beginPath(); ctx.arc(r * 0.28, -r * 0.3, r * 0.16, 0, Math.PI * 2); ctx.arc(-r * 0.24, -r * 0.3, r * 0.14, 0, Math.PI * 2); ctx.fill();
   ctx.strokeStyle = '#111'; ctx.lineWidth = r * 0.15; ctx.lineCap = 'round';
   ctx.beginPath();
   ctx.moveTo(r * 0.05, -r * 0.65); ctx.lineTo(r * 0.55, -r * 0.85);
   ctx.moveTo(-r * 0.5, -r * 0.85); ctx.lineTo(-r * 0.05, -r * 0.65);
   ctx.stroke();
-
   ctx.fillStyle = '#ff9500'; ctx.strokeStyle = '#cc6a00'; ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(r * 0.75, -r * 0.05);
-  ctx.lineTo(r * 1.35, r * 0.05);
-  ctx.lineTo(r * 0.75, r * 0.28);
-  ctx.closePath(); ctx.fill(); ctx.stroke();
-
+  ctx.beginPath(); ctx.moveTo(r * 0.75, -r * 0.05); ctx.lineTo(r * 1.35, r * 0.05); ctx.lineTo(r * 0.75, r * 0.28); ctx.closePath(); ctx.fill(); ctx.stroke();
   if (type === 'red') {
     ctx.fillStyle = def.accent;
-    ctx.beginPath();
-    ctx.moveTo(-r * 0.15, -r);
-    ctx.lineTo(-r * 0.35, -r * 1.35);
-    ctx.lineTo(0, -r * 1.05);
-    ctx.closePath();
-    ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-r * 0.15, -r); ctx.lineTo(-r * 0.35, -r * 1.35); ctx.lineTo(0, -r * 1.05); ctx.closePath(); ctx.fill();
   }
-
   ctx.restore();
 }
-
 function drawPig(ctx, x, y, r, hpFrac) {
   const t = 1 - hpFrac;
   const g = Math.floor(120 + 100 * hpFrac);
@@ -2459,16 +2846,10 @@ function drawPig(ctx, x, y, r, hpFrac) {
   ctx.strokeStyle = darkColor; ctx.lineWidth = 2; ctx.stroke();
   const eyeR = Math.max(3, r * 0.2);
   ctx.fillStyle = '#fff';
-  ctx.beginPath();
-  ctx.arc(-r * 0.32, -r * 0.22, eyeR, 0, Math.PI * 2);
-  ctx.arc(r * 0.32, -r * 0.22, eyeR, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(-r * 0.32, -r * 0.22, eyeR, 0, Math.PI * 2); ctx.arc(r * 0.32, -r * 0.22, eyeR, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = '#111';
   const pr = eyeR * 0.5;
-  ctx.beginPath();
-  ctx.arc(-r * 0.32, -r * 0.22, pr, 0, Math.PI * 2);
-  ctx.arc(r * 0.32, -r * 0.22, pr, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.beginPath(); ctx.arc(-r * 0.32, -r * 0.22, pr, 0, Math.PI * 2); ctx.arc(r * 0.32, -r * 0.22, pr, 0, Math.PI * 2); ctx.fill();
   if (hpFrac < 0.6) {
     ctx.strokeStyle = '#222'; ctx.lineWidth = r * 0.12; ctx.lineCap = 'round';
     ctx.beginPath();
@@ -2485,7 +2866,6 @@ function drawPig(ctx, x, y, r, hpFrac) {
   ctx.fill();
   ctx.restore();
 }
-
 function drawBlock(ctx, body) {
   const verts = body.vertices;
   const mat = MATERIALS[body.material];
@@ -2533,19 +2913,13 @@ function drawBlock(ctx, body) {
     ctx.restore();
   }
 }
-
 function drawEgg(ctx, body) {
   const x = body.position.x, y = body.position.y;
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(body.angle);
+  ctx.save(); ctx.translate(x, y); ctx.rotate(body.angle);
   const grad = ctx.createRadialGradient(-4, -4, 2, 0, 0, 12);
-  grad.addColorStop(0, '#ffffff');
-  grad.addColorStop(1, '#e0d8c8');
+  grad.addColorStop(0, '#ffffff'); grad.addColorStop(1, '#e0d8c8');
   ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.ellipse(0, 0, 10, 13, 0, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0, 0, 10, 13, 0, 0, Math.PI * 2); ctx.fill();
   ctx.strokeStyle = '#b8a88a'; ctx.lineWidth = 1.5; ctx.stroke();
   if (body.timer !== undefined && body.timer < 20) {
     ctx.strokeStyle = '#8a6a4a'; ctx.lineWidth = 1.5;
@@ -2563,7 +2937,6 @@ function drawEgg(ctx, body) {
   }
   ctx.restore();
 }
-
 function shade(hex, factor) {
   const h = hex.replace('#', '');
   const r = Math.min(255, Math.floor(parseInt(h.substr(0, 2), 16) * factor));
@@ -2571,7 +2944,6 @@ function shade(hex, factor) {
   const b = Math.min(255, Math.floor(parseInt(h.substr(4, 2), 16) * factor));
   return `rgb(${r},${g},${b})`;
 }
-
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
@@ -2581,15 +2953,12 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
 }
-
-// ★ BIRDS 框整体下移 24px（原来从 y=120 开始，现在从 y=144）
 function drawBirdListUI() {
   const listW = 60 + birdsLeft.length * 38;
   ctx.fillStyle = 'rgba(0,0,0,.35)';
   roundRect(ctx, 16, 144, listW, 80, 12); ctx.fill();
   ctx.fillStyle = '#fff'; ctx.font = 'bold 16px Arial';
-  ctx.fillText('BIRDS', 32, 169);
-
+  ctx.fillText(T.hudBirds, 32, 169);
   for (let i = 0; i < birdsLeft.length; i++) {
     const bx = 105 + i * 38, by = 162;
     const def = BIRD_DEFS[birdsLeft[i]];
@@ -2597,283 +2966,173 @@ function drawBirdListUI() {
     ctx.beginPath(); ctx.arc(bx, by, 13, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = def.accent; ctx.lineWidth = 2; ctx.stroke();
     ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(bx - 3, by - 3, 3.5, 0, Math.PI * 2);
-    ctx.arc(bx + 4, by - 3, 3.5, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(bx - 3, by - 3, 3.5, 0, Math.PI * 2); ctx.arc(bx + 4, by - 3, 3.5, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(bx - 2, by - 3, 1.6, 0, Math.PI * 2);
-    ctx.arc(bx + 5, by - 3, 1.6, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(bx - 2, by - 3, 1.6, 0, Math.PI * 2); ctx.arc(bx + 5, by - 3, 1.6, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#ff9500';
-    ctx.beginPath();
-    ctx.moveTo(bx + 10, by); ctx.lineTo(bx + 15, by + 2); ctx.lineTo(bx + 10, by + 4);
-    ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(bx + 10, by); ctx.lineTo(bx + 15, by + 2); ctx.lineTo(bx + 10, by + 4); ctx.closePath(); ctx.fill();
     if (UNLIMITED_ABILITY_BIRDS.includes(birdsLeft[i])) {
       ctx.fillStyle = '#4ade80';
       ctx.beginPath(); ctx.arc(bx + 11, by - 12, 4, 0, Math.PI * 2); ctx.fill();
       ctx.strokeStyle = '#0f1722'; ctx.lineWidth = 1; ctx.stroke();
-      ctx.fillStyle = '#0f1722';
-      ctx.font = 'bold 7px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('∞', bx + 11, by - 10);
-      ctx.textAlign = 'left';
+      ctx.fillStyle = '#0f1722'; ctx.font = 'bold 7px Arial'; ctx.textAlign = 'center';
+      ctx.fillText('∞', bx + 11, by - 10); ctx.textAlign = 'left';
     } else if (EXTRA_LIFE_BIRDS[birdsLeft[i]]) {
       ctx.fillStyle = '#7dd3ff';
       ctx.beginPath(); ctx.arc(bx + 11, by - 12, 5, 0, Math.PI * 2); ctx.fill();
       ctx.strokeStyle = '#0f1722'; ctx.lineWidth = 1; ctx.stroke();
-      ctx.fillStyle = '#0f1722';
-      ctx.font = 'bold 7px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('+', bx + 11, by - 10);
-      ctx.textAlign = 'left';
+      ctx.fillStyle = '#0f1722'; ctx.font = 'bold 7px Arial'; ctx.textAlign = 'center';
+      ctx.fillText('+', bx + 11, by - 10); ctx.textAlign = 'left';
     }
   }
-
   if (birdsLeft.length > 0) {
     const firstDef = BIRD_DEFS[birdsLeft[0]];
     if (firstDef.ability) {
-      let hint = ABILITY_HINTS[firstDef.ability] || '';
+      let hint = T.abilityHints[firstDef.ability] || '';
       if (state === 'flying' && birdBody) {
         const isUnlimited = UNLIMITED_ABILITY_BIRDS.includes(birdBody.birdType);
         if (birdBody.birdType === 'white') {
-          if (birdEggsUsed >= MAX_EGGS_PER_BIRD) {
-            hint = `投蛋 ${birdEggsUsed}/${MAX_EGGS_PER_BIRD} 已用尽`;
-          } else {
-            hint = `投蛋 ${birdEggsUsed}/${MAX_EGGS_PER_BIRD}`;
-          }
+          hint = birdEggsUsed >= MAX_EGGS_PER_BIRD ? `${T.hudEggs} ${birdEggsUsed}/${MAX_EGGS_PER_BIRD} ${T.hudEggsExhausted}` : `${T.hudEggs} ${birdEggsUsed}/${MAX_EGGS_PER_BIRD}`;
         } else if (isUnlimited) {
-          hint = birdAbilityCooldown > 0 ? '技能冷却中...' : '连点：持续发动';
+          hint = birdAbilityCooldown > 0 ? T.hudCooldown : T.hudContinuous;
         } else if (birdUsedAbility) {
-          hint = '技能已用';
+          hint = T.hudUsed;
         }
         if (birdMaxExtraLife > 0) {
           const remaining = Math.ceil(birdExtraLifeTimer / 60 * 10) / 10;
-          hint = `${hint} · 延寿 ${remaining.toFixed(1)}s`;
+          hint = `${hint} · ${T.hudExtraLife} ${remaining.toFixed(1)}s`;
         }
       }
       if (hint) {
         const exhausted = (birdBody && birdBody.birdType === 'white' && birdEggsUsed >= MAX_EGGS_PER_BIRD);
-        let bgColor = 'rgba(255,210,63,.25)';
-        let fgColor = '#ffe74c';
+        let bgColor = 'rgba(255,210,63,.25)', fgColor = '#ffe74c';
         if (state === 'flying' && birdBody && UNLIMITED_ABILITY_BIRDS.includes(birdBody.birdType)) {
-          if (exhausted) {
-            bgColor = 'rgba(255,107,107,.25)';
-            fgColor = '#ff8b8b';
-          } else {
-            bgColor = 'rgba(74,222,128,.25)';
-            fgColor = '#7de89a';
-          }
+          if (exhausted) { bgColor = 'rgba(255,107,107,.25)'; fgColor = '#ff8b8b'; }
+          else { bgColor = 'rgba(74,222,128,.25)'; fgColor = '#7de89a'; }
         } else if (state === 'flying' && birdBody && EXTRA_LIFE_BIRDS[birdBody.birdType]) {
-          bgColor = 'rgba(100,200,255,.25)';
-          fgColor = '#7dd3ff';
+          bgColor = 'rgba(100,200,255,.25)'; fgColor = '#7dd3ff';
         }
         ctx.fillStyle = bgColor;
         roundRect(ctx, 16, 232, Math.max(listW, 240), 28, 8); ctx.fill();
-        ctx.fillStyle = fgColor;
-        ctx.font = 'bold 13px Arial';
+        ctx.fillStyle = fgColor; ctx.font = 'bold 13px Arial';
         ctx.fillText(`${firstDef.icon} ${hint}`, 28, 251);
       }
     }
   }
 }
-
-// ★ SCORE + TOTAL 合并显示
 function drawUI() {
-  // ---- 主分数框（合并 SCORE + TOTAL）----
   ctx.fillStyle = 'rgba(0,0,0,.42)';
   roundRect(ctx, 16, 16, 220, 120, 12); ctx.fill();
-
-  // 本关分数标签
-  ctx.fillStyle = 'rgba(255,255,255,.6)';
-  ctx.font = 'bold 13px Arial';
-  ctx.fillText('本关分数', 32, 40);
-
-  // 本关分数数字
-  ctx.font = 'bold 30px Arial';
-  ctx.fillStyle = '#ffe74c';
+  ctx.fillStyle = 'rgba(255,255,255,.6)'; ctx.font = 'bold 13px Arial';
+  ctx.fillText(T.hudScore, 32, 40);
+  ctx.font = 'bold 30px Arial'; ctx.fillStyle = '#ffe74c';
   ctx.fillText(score.toString(), 32, 74);
-
-  // 分隔线
-  ctx.strokeStyle = 'rgba(255,255,255,.15)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(30, 86);
-  ctx.lineTo(222, 86);
-  ctx.stroke();
-
-  // 总分标签
-  ctx.fillStyle = 'rgba(125,211,255,.85)';
-  ctx.font = 'bold 13px Arial';
-  ctx.fillText('总分', 32, 106);
-
-  // 总分数字
-  ctx.font = 'bold 22px Arial';
-  ctx.fillStyle = '#7dd3ff';
+  ctx.strokeStyle = 'rgba(255,255,255,.15)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(30, 86); ctx.lineTo(222, 86); ctx.stroke();
+  ctx.fillStyle = 'rgba(125,211,255,.85)'; ctx.font = 'bold 13px Arial';
+  ctx.fillText(T.hudTotal, 32, 106);
+  ctx.font = 'bold 22px Arial'; ctx.fillStyle = '#7dd3ff';
   ctx.fillText(totalScore.toString(), 32, 130);
-
-  // 小鸟列表（BIRDS 框 y=144）
   drawBirdListUI();
-
-  // 猪列表（PIGS 框 y=268）
   const pigs = Composite.allBodies(world).filter(b => b.gameType === 'pig' && !b.dead).length;
   const pigsY = 268;
   ctx.fillStyle = 'rgba(0,0,0,.35)';
   roundRect(ctx, 16, pigsY, 60 + Math.max(1, pigs) * 32, 52, 12); ctx.fill();
   ctx.fillStyle = '#fff'; ctx.font = 'bold 16px Arial';
-  ctx.fillText('PIGS', 32, pigsY + 32);
+  ctx.fillText(T.hudPigs, 32, pigsY + 32);
   for (let i = 0; i < pigs; i++) {
     const px = 108 + i * 32, py = pigsY + 26;
     ctx.fillStyle = '#5ac85a';
     ctx.beginPath(); ctx.arc(px, py, 11, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = '#2d6a2d'; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(px - 3, py - 2, 3, 0, Math.PI * 2);
-    ctx.arc(px + 4, py - 2, 3, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(px - 3, py - 2, 3, 0, Math.PI * 2); ctx.arc(px + 4, py - 2, 3, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(px - 2.5, py - 2, 1.4, 0, Math.PI * 2);
-    ctx.arc(px + 4.5, py - 2, 1.4, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(px - 2.5, py - 2, 1.4, 0, Math.PI * 2); ctx.arc(px + 4.5, py - 2, 1.4, 0, Math.PI * 2); ctx.fill();
   }
-
   ctx.fillStyle = 'rgba(0,0,0,.35)';
   roundRect(ctx, W - 310, 16, 294, 90, 12); ctx.fill();
   ctx.fillStyle = '#fff'; ctx.font = 'bold 14px Arial';
-  ctx.fillText('拖动小鸟发射 · 飞行中点击/空格 = 特殊能力', W - 294, 44);
-  ctx.fillText('R = 重玩本关 · N = 生成新关卡', W - 294, 68);
-  ctx.fillText('关卡 ' + (levelIndex + 1), W - 294, 92);
-
+  ctx.fillText(T.hudHint1, W - 294, 44);
+  ctx.fillText(T.hudHint2, W - 294, 68);
+  ctx.fillText(T.hudLevel + ' ' + (levelIndex + 1), W - 294, 92);
   if (state === 'flying' && birdsLeft.length > 0 && canSkipTurn) {
     const bw = 180, bh = 48;
-    const bx = W / 2 - bw / 2;
-    const by = H - 90;
+    const bx = W / 2 - bw / 2, by = H - 90;
     skipButtonBounds = { x: bx, y: by, w: bw, h: bh };
-
     ctx.fillStyle = 'rgba(0,0,0,.35)';
     roundRect(ctx, bx + 2, by + 4, bw, bh, 24); ctx.fill();
     const grd = ctx.createLinearGradient(bx, by, bx, by + bh);
-    grd.addColorStop(0, '#4a9eea');
-    grd.addColorStop(1, '#2f7bc4');
+    grd.addColorStop(0, '#4a9eea'); grd.addColorStop(1, '#2f7bc4');
     ctx.fillStyle = grd;
     roundRect(ctx, bx, by, bw, bh, 24); ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,.5)';
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255,255,255,.5)'; ctx.lineWidth = 2;
     roundRect(ctx, bx, by, bw, bh, 24); ctx.stroke();
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 18px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('跳过本回合', bx + bw / 2, by + bh / 2 + 1);
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 18px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(T.hudSkip, bx + bw / 2, by + bh / 2 + 1);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
   } else {
     skipButtonBounds = null;
   }
 }
 
-// ============================================================
-//  渲染
-// ============================================================
 function render() {
   ctx.setTransform(scaleFactor, 0, 0, scaleFactor, 0, 0);
   ctx.drawImage(skyCanvas, 0, 0);
   drawGround();
   if (state === 'aiming' && birdsLeft.length) drawBandBack();
   drawSling();
-
   for (const body of Composite.allBodies(world)) {
     if (body.gameType === 'block') drawBlock(ctx, body);
-    else if (body.gameType === 'pig') {
-      drawPig(ctx, body.position.x, body.position.y, body.r, Math.max(0, body.hp / body.maxHp));
-    } else if (body.gameType === 'egg') {
-      drawEgg(ctx, body);
-    }
+    else if (body.gameType === 'pig') drawPig(ctx, body.position.x, body.position.y, body.r, Math.max(0, body.hp / body.maxHp));
+    else if (body.gameType === 'egg') drawEgg(ctx, body);
   }
-
   if (state === 'aiming' && birdsLeft.length && !birdBody) {
     const bx = dragging ? dragPos.x : SLING_X;
     const by = dragging ? dragPos.y : SLING_Y - 8;
     drawBird(ctx, bx, by, birdsLeft[0], 0);
   }
   if (state === 'aiming' && birdsLeft.length) drawBandFront();
-
   if (birdBody) {
     let drawR = BIRD_R;
     if (birdBody.inflated && birdBody.inflateTime > 0) {
       drawR = BIRD_R * 1.5;
-      ctx.save();
-      ctx.globalAlpha = 0.3 + Math.sin(performance.now() * 0.02) * 0.2;
-      ctx.strokeStyle = '#ff8c42';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.arc(birdBody.position.x, birdBody.position.y, BIRD_R * 2.2, 0, Math.PI * 2);
-      ctx.stroke();
+      ctx.save(); ctx.globalAlpha = 0.3 + Math.sin(performance.now() * 0.02) * 0.2;
+      ctx.strokeStyle = '#ff8c42'; ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.arc(birdBody.position.x, birdBody.position.y, BIRD_R * 2.2, 0, Math.PI * 2); ctx.stroke();
       ctx.restore();
     }
     drawBird(ctx, birdBody.position.x, birdBody.position.y, birdBody.birdType, birdBody.angle, drawR);
-
     if (UNLIMITED_ABILITY_BIRDS.includes(birdBody.birdType)) {
-      const ready = birdAbilityCooldown === 0 &&
-        !(birdBody.birdType === 'white' && birdEggsUsed >= MAX_EGGS_PER_BIRD);
-      ctx.save();
-      ctx.globalAlpha = ready ? 0.5 + Math.sin(performance.now() * 0.01) * 0.3 : 0.15;
-      ctx.strokeStyle = ready ? '#4ade80' : '#888';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(birdBody.position.x, birdBody.position.y, BIRD_R * 2.5, 0, Math.PI * 2);
-      ctx.stroke();
+      const ready = birdAbilityCooldown === 0 && !(birdBody.birdType === 'white' && birdEggsUsed >= MAX_EGGS_PER_BIRD);
+      ctx.save(); ctx.globalAlpha = ready ? 0.5 + Math.sin(performance.now() * 0.01) * 0.3 : 0.15;
+      ctx.strokeStyle = ready ? '#4ade80' : '#888'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(birdBody.position.x, birdBody.position.y, BIRD_R * 2.5, 0, Math.PI * 2); ctx.stroke();
       ctx.restore();
     }
-
     if (EXTRA_LIFE_BIRDS[birdBody.birdType] && birdExtraLifeTimer > 0) {
       const frac = birdExtraLifeTimer / birdMaxExtraLife;
       const pulse = 0.5 + Math.sin(performance.now() * 0.01) * 0.3;
-      ctx.save();
-      ctx.globalAlpha = frac * pulse;
-      ctx.strokeStyle = birdBody.birdType === 'black' ? '#ffe74c' : '#c39bd3';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(birdBody.position.x, birdBody.position.y, BIRD_R * (2.8 + (1 - frac) * 1.2), 0, Math.PI * 2);
-      ctx.stroke();
+      ctx.save(); ctx.globalAlpha = frac * pulse;
+      ctx.strokeStyle = birdBody.birdType === 'black' ? '#ffe74c' : '#c39bd3'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(birdBody.position.x, birdBody.position.y, BIRD_R * (2.8 + (1 - frac) * 1.2), 0, Math.PI * 2); ctx.stroke();
       ctx.restore();
     }
   }
   for (const b of Composite.allBodies(world)) {
-    if (b.gameType === 'bird' && b !== birdBody) {
-      drawBird(ctx, b.position.x, b.position.y, b.birdType, b.angle, 9);
-    }
+    if (b.gameType === 'bird' && b !== birdBody) drawBird(ctx, b.position.x, b.position.y, b.birdType, b.angle, 9);
   }
-
   for (const wave of empWaves) {
     const frac = 1 - wave.life / wave.maxLife;
     const r = wave.maxRadius * frac;
     const alpha = Math.min(1, wave.life / wave.maxLife * 1.5);
     ctx.save();
-    ctx.globalAlpha = alpha * 0.7;
-    ctx.strokeStyle = '#c39bd3';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.arc(wave.x, wave.y, r, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.globalAlpha = alpha * 0.4;
-    ctx.strokeStyle = '#9b59b6';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(wave.x, wave.y, r * 0.7, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.globalAlpha = alpha * 0.6;
-    ctx.strokeStyle = '#e0c5f0';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(wave.x, wave.y, r * 0.4, 0, Math.PI * 2);
-    ctx.stroke();
+    ctx.globalAlpha = alpha * 0.7; ctx.strokeStyle = '#c39bd3'; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(wave.x, wave.y, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha = alpha * 0.4; ctx.strokeStyle = '#9b59b6'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(wave.x, wave.y, r * 0.7, 0, Math.PI * 2); ctx.stroke();
     ctx.restore();
   }
-
   if (dragging) {
     const dx = SLING_X - dragPos.x, dy = SLING_Y - dragPos.y;
     const pull = Math.hypot(dx, dy);
@@ -2884,13 +3143,11 @@ function render() {
       const pts = predictTrajectory(dragPos.x, dragPos.y, Math.cos(ang) * speed, Math.sin(ang) * speed);
       for (let i = 0; i < pts.length; i++) {
         const p = pts[i], t = i / pts.length;
-        ctx.globalAlpha = 1 - t * 0.85;
-        ctx.fillStyle = '#fff';
+        ctx.globalAlpha = 1 - t * 0.85; ctx.fillStyle = '#fff';
         ctx.beginPath(); ctx.arc(p.x, p.y, 4 - t * 2.5, 0, Math.PI * 2); ctx.fill();
       }
       ctx.globalAlpha = 1;
-      ctx.save();
-      ctx.translate(SLING_X, SLING_Y + 120);
+      ctx.save(); ctx.translate(SLING_X, SLING_Y + 120);
       ctx.fillStyle = 'rgba(0,0,0,.4)';
       roundRect(ctx, -60, -10, 120, 20, 10); ctx.fill();
       const powerW = Math.min(pull, MAX_PULL) / MAX_PULL * 116;
@@ -2901,27 +3158,20 @@ function render() {
       ctx.restore();
     }
   }
-
   particlesSys.draw(ctx);
   drawFloaters(ctx);
   drawUI();
 }
 
-// ============================================================
-//  主循环
-// ============================================================
 let lastTime = performance.now();
 let accumulator = 0;
-
 function updateSpecialEffects() {
   processEmpPulses();
-
   for (const wave of empWaves) {
     wave.life -= 0.04;
     wave.radius = wave.maxRadius * (1 - wave.life / wave.maxLife);
   }
   empWaves = empWaves.filter(w => w.life > 0);
-
   for (const egg of eggs) {
     if (egg.timer !== undefined) {
       egg.timer--;
@@ -2933,22 +3183,13 @@ function updateSpecialEffects() {
     }
   }
   eggs = eggs.filter(e => !e.dead);
-
   if (birdBody && birdBody.inflated && birdBody.inflateTime > 0) {
     birdBody.inflateTime--;
-    if (birdBody.inflateTime <= 0) {
-      birdBody.inflated = false;
-      Body.setMass(birdBody, 1);
-    }
+    if (birdBody.inflateTime <= 0) { birdBody.inflated = false; Body.setMass(birdBody, 1); }
   }
-
   if (birdAbilityCooldown > 0) birdAbilityCooldown--;
-
-  if (birdExtraLifeTimer > 0) {
-    birdExtraLifeTimer--;
-  }
+  if (birdExtraLifeTimer > 0) birdExtraLifeTimer--;
 }
-
 function loop(now) {
   requestAnimationFrame(loop);
   const frameTime = Math.min(now - lastTime, 100);
@@ -2966,13 +3207,11 @@ function loop(now) {
   updateFloaters();
   render();
 }
-
 function stepGameLogic() {
   processRemovals();
   checkEscapees();
   if (state !== 'flying') return;
   flyingTime++;
-
   if (birdBody) {
     const p = birdBody.position;
     if (p.x < -200 || p.x > W + 300 || p.y > H + 300 || p.y < CEILING - 100) {
@@ -2980,9 +3219,7 @@ function stepGameLogic() {
       birdBody = null;
     }
   }
-
   const hasExtraLife = birdExtraLifeTimer > 0;
-
   if (birdBody && !EXEMPT_FROM_AUTO_SETTLE.includes(birdBody.birdType)) {
     const v = birdBody.velocity;
     const speed = Math.hypot(v.x, v.y);
@@ -2993,54 +3230,40 @@ function stepGameLogic() {
         forceSkipTurn();
         return;
       }
-    } else {
-      birdStillTimer = 0;
-    }
+    } else birdStillTimer = 0;
   } else if (birdBody && EXEMPT_FROM_AUTO_SETTLE.includes(birdBody.birdType)) {
     birdStillTimer = 0;
   }
-
   const dyn = Composite.allBodies(world).filter(b =>
     !b.isStatic && (b.gameType === 'bird' || b.gameType === 'block' || b.gameType === 'pig')
   );
   let allSlow = true;
   for (const b of dyn) {
-    if (b.speed > SETTLE_SPEED || Math.abs(b.angularVelocity) > SETTLE_ANGVEL) {
-      allSlow = false;
-      break;
-    }
+    if (b.speed > SETTLE_SPEED || Math.abs(b.angularVelocity) > SETTLE_ANGVEL) { allSlow = false; break; }
   }
   const birdGone = !birdBody;
   const birdGoneLongEnough = birdGone && flyingTime > BIRD_GONE_GRACE;
   const hardTimeout = flyingTime > HARD_TIMEOUT_FRAMES;
   const eggPending = eggs.length > 0;
-
   const shouldCountdown =
     !hasExtraLife && !eggPending && (
       (birdGoneLongEnough && allSlow) ||
       (birdGoneLongEnough && flyingTime > 90) ||
       hardTimeout
     );
-
   if (shouldCountdown) {
     endTurnTimer++;
-    if (endTurnTimer > SETTLE_FRAMES) {
-      endTurn();
-      return;
-    }
-  } else {
-    endTurnTimer = 0;
-  }
-
+    if (endTurnTimer > SETTLE_FRAMES) { endTurn(); return; }
+  } else endTurnTimer = 0;
   canSkipTurn = birdGone && flyingTime > 30 && !eggPending && !hasExtraLife;
 }
 
-// ============================================================
-//  启动
-// ============================================================
+setLang(loadLang());
 buildBirdGuide();
+buildGuidePage();
 renderSeedHistory();
 seedGo.disabled = true;
+updateRestartVisibility();
 requestAnimationFrame(() => {
   ctx.setTransform(scaleFactor, 0, 0, scaleFactor, 0, 0);
   ctx.drawImage(skyCanvas, 0, 0);
