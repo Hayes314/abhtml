@@ -1,6 +1,6 @@
 <h1>Angry Bird</h1>
 
-[read English](README_en.md)
+[read English](README.md)
 
 link:[https://hayes314.github.io/abhtml](https://hayes314.github.io/abhtml)
 
